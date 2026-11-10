@@ -1,0 +1,86 @@
+@import "tailwindcss";
+
+:root {
+  --bg: #f4f6fa;
+  --surface: #ffffff;
+  --surface-2: #eef1f6;
+  --border: #dfe4ec;
+  --text: #131a26;
+  --muted: #647084;
+  --primary: #2f5bea;
+  --primary-fg: #ffffff;
+  --income: #12925a;
+  --expense: #d43d4c;
+  --warn: #c77a08;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0d1117;
+    --surface: #161c26;
+    --surface-2: #1f2733;
+    --border: #2a3342;
+    --text: #e8ecf3;
+    --muted: #93a0b4;
+    --primary: #6f8dff;
+    --primary-fg: #0d1117;
+    --income: #3dcc8a;
+    --expense: #ff6b78;
+    --warn: #f0b23e;
+  }
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-border: var(--border);
+  --color-text: var(--text);
+  --color-muted: var(--muted);
+  --color-primary: var(--primary);
+  --color-primary-fg: var(--primary-fg);
+  --color-income: var(--income);
+  --color-expense: var(--expense);
+  --color-warn: var(--warn);
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+html {
+  color-scheme: light dark;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.num {
+  font-variant-numeric: tabular-nums;
+}
+
+input,
+select,
+textarea {
+  font-size: 16px; /* evita el zoom automàtic d'iOS en enfocar */
+}
+
+@keyframes sheet-in {
+  from {
+    transform: translateY(16px);
+    opacity: 0;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+.sheet-in {
+  animation: sheet-in 0.18s ease-out;
+}
+@media (prefers-reduced-motion: reduce) {
+  .sheet-in {
+    animation: none;
+  }
+}

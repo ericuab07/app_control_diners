@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { DataProvider } from "@/components/DataProvider";
+import { LifeProvider } from "@/components/LifeProvider";
 import { supabase } from "@/lib/supabase";
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
@@ -23,7 +24,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   if (!session) return <div className="grid min-h-dvh place-items-center text-muted">Carregant…</div>;
   return (
     <DataProvider session={session}>
-      <AppShell>{children}</AppShell>
+      <LifeProvider session={session}>
+        <AppShell>{children}</AppShell>
+      </LifeProvider>
     </DataProvider>
   );
 }

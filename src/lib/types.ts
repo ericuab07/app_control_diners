@@ -82,3 +82,13 @@ export interface PriceQuote {
   manual: boolean;
   fetched_at: string;
 }
+
+/** Preferències del panell de vida (una fila per usuari a `settings`). */
+export interface Settings {
+  display_name: string;
+  week_focus: string;
+  week_focus_monday: string | null;
+  step_goal: number;
+  water_goal: number;
+  sleep_goal_minutes: number;
+}

@@ -1,4 +1,4 @@
-import type { CategoryKind } from "./types";
+import type { CategoryKind, Settings } from "./types";
 
 export const DEFAULT_CATEGORIES: { name: string; kind: CategoryKind; color: string; icon: string }[] = [
   { name: "Habitatge", kind: "expense", color: "#6366f1", icon: "🏠" },
@@ -35,3 +35,13 @@ export const PALETTE = [
   "#2563eb", "#6366f1", "#a855f7", "#ec4899", "#f43f5e", "#ef4444", "#f97316",
   "#eab308", "#22c55e", "#16a34a", "#14b8a6", "#06b6d4", "#0ea5e9", "#64748b",
 ];
+
+/** Valors per defecte del panell quan encara no hi ha fila a `settings`. */
+export const DEFAULT_SETTINGS: Settings = {
+  display_name: "",
+  week_focus: "",
+  week_focus_monday: null,
+  step_goal: 8000,
+  water_goal: 8,
+  sleep_goal_minutes: 450,
+};

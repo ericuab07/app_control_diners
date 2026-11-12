@@ -1,14 +1,15 @@
 "use client";
 
-import { useState } from "react";
 import { isoWeekNumber } from "@/lib/calc/week";
-import { formatLongDate, todayISO } from "@/lib/dates";
-import { greeting } from "@/lib/time";
+import { formatLongDate } from "@/lib/dates";
+import { greeting, toMinutes } from "@/lib/time";
 import { useLife } from "../LifeProvider";
+import { useNow } from "./useNow";
 
 export function GreetingHeader() {
   const { settings } = useLife();
-  const [{ hour, today }] = useState(() => ({ hour: new Date().getHours(), today: todayISO() }));
+  const { today, now } = useNow();
+  const hour = Math.floor(toMinutes(now) / 60);
   const name = settings.display_name.trim();
   return (
     <header className="mb-1">

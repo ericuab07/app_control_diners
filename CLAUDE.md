@@ -34,12 +34,12 @@ http://localhost:3100, executa a la consola el `seed` de http://localhost:54399/
 ```
 src/lib/calc/        lògica pura i testada: balances, budgets, stats, recurring, portfolio, csv,
                      week (setmana, focus), agenda, dayProgress, countdowns, tasks, habits, health,
-                     goals, study
+                     goals, study, journal
 src/lib/             types, money (cèntims), dates (ISO YYYY-MM-DD), time (HH:MM), nav, defaults, supabase
 src/components/      DataProvider, LifeProvider, AppShell (navegació), DinersTabs, TransactionForm/List,
                      ui, settings/* (Perfil inclòs), avui/* (targetes de la portada), habits/*,
-                     goals/*, study/*, QuickAdd («+» fora de Diners)
-src/app/(app)/       pàgines amb sessió: / (Avui), habits, objectius, estudis, diners (balanç), ingressos,
+                     goals/*, study/*, journal/*, QuickAdd («+» fora de Diners)
+src/app/(app)/       pàgines amb sessió: / (Avui), habits, objectius, estudis, diari, diners (balanç), ingressos,
                      despeses, accions,
                      pressupostos, estadistiques, configuracio
 src/app/login/       inici de sessió i registre
@@ -82,7 +82,13 @@ Panell de vida en curs (spec `docs/superpowers/specs/2026-11-12-panell-de-vida-d
 - [x] **Fase 3 · Llarg termini:** `/objectius` (barra amb marca del ritme esperat, ±1 ràpid, per anys),
       `/estudis` (assignatures, entregues/exàmens amb vençuts en vermell, minuts per setmana), targetes
       «Objectius» i «Properes entregues» a Avui. Navegació final: mòbil Avui · Hàbits · + · Objectius · Més.
-- [ ] Fase 4 · Diari
+- [x] **Fase 4 · Diari:** `/diari` (ànim 1–5 amb emoji, nota fins a 2000 caràcters, qualsevol dia
+      passat, gràfic de 30 dies amb buits on no hi ha entrada, llista d'entrades), targeta «Com estàs
+      avui?» a Avui i frase del dia rotativa (12 frases a `QUOTES`).
+
+Taules del panell (totes amb RLS «own rows», migracions `20261112*` ja aplicades al Supabase real):
+`settings`, `tasks`, `events`, `countdowns`, `habits`, `habit_logs`, `health_logs`, `goals`, `courses`,
+`study_items`, `study_logs`, `journal_entries`. Plans de cada fase a `docs/superpowers/plans/`.
 
 ### v1 de diners (2026-11-10)
 
@@ -107,7 +113,14 @@ v1 completa i provada de punta a punta en navegador contra el Supabase real:
 - [ ] En `next dev` surten avisos «Could not validate that a segment … has instant navigation» a totes
       les rutes (també les de la v1): l'app es renderitza tota al client darrere la sessió. Només surt en
       desenvolupament; es podria silenciar amb `export const instant = false` si molesta.
-- [ ] Decisió presa: l'spec deia «Empeça per una»; s'ha posat «Comença per una» (errada ortogràfica).
+- [ ] Decisions preses sense preguntar (revisa-les si no t'agraden): «Comença per una» en lloc de
+      «Empeça per una» (errada a l'spec); objectius «Vas bé» amb una setmana de marge; hàbits setmanals
+      «toquen» fins complir la meta; «Descans» compta com a entreno fet; targeta «Properes entregues» a Avui
+      (l'spec no la dibuixava); frases del dia escrites de nou (sense cites amb drets).
+- [ ] Petites millores per més endavant: veure i recuperar comptes enrere arxivats o passats; tasques
+      que no siguin de «les 3»; editar una sola ocurrència d'un esdeveniment setmanal (fora de l'abast del v1).
+- [ ] `/find-skills` no ha trobat skills externes fiables per a hàbits, objectius, diari o gràfics
+      (només paquets amb molt poques instal·lacions); s'han fet servir les locals.
 - [ ] Supabase avisa «Leaked password protection disabled» (Auth → Providers → Email). Activar-ho és
       opcional; no s'ha tocat perquè és configuració d'Auth.
 
@@ -124,6 +137,10 @@ v1 completa i provada de punta a punta en navegador contra el Supabase real:
 - `supabase-postgres-best-practices` (oficial de Supabase, instal·lada amb `npx skills add supabase/agent-skills`):
   polítiques RLS amb `(select auth.uid())`, índexs a les FK i a `user_id`, restriccions `check`.
 - `superpowers:executing-plans` / `test-driven-development`: execució tasca a tasca amb test en vermell primer.
+- `superpowers:writing-plans`: plans de les fases 2, 3 i 4 a `docs/superpowers/plans/`.
+- `dataviz`: gràfic d'ànim (una sèrie sense llegenda, línia 2 px, punts 8 px, graella discreta, buits,
+  tooltip i la llista com a vista textual).
+- Navegador integrat de Claude + `scripts/mock-supabase.mjs`: proves visuals a 1280 px fosc i 375 px clar.
 
 ## Limitacions conegudes
 

@@ -13,7 +13,7 @@ export function DayCard() {
   const { today } = useNow();
   const progress = useMemo(() => dayProgress(tasks.filter((t) => t.date === today)), [tasks, today]);
   return (
-    <Card className="flex items-center gap-5">
+    <Card className="flex h-full items-center gap-5">
       <ProgressRing ratio={progress.ratio} caption={progress.label} />
       <div className="min-w-0">
         <h2 className="text-xs font-medium uppercase tracking-wide text-muted">El teu dia</h2>

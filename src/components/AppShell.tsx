@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { isDinersPath, sectionOf, type Section } from "@/lib/nav";
 import { DinersTabs } from "./DinersTabs";
+import { QuickAdd } from "./QuickAdd";
 import { TransactionForm } from "./TransactionForm";
 import { cx } from "./ui";
 
@@ -47,11 +48,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <Icon size={18} /> {label}
           </Link>
         ))}
-        {inDiners && (
-          <button onClick={() => setAdding(true)} className="mt-4 inline-flex min-h-10 items-center justify-center gap-1.5 rounded-lg bg-primary px-3 text-sm font-medium text-primary-fg hover:opacity-90">
-            <Plus size={18} /> Nou moviment
-          </button>
-        )}
+        <button onClick={() => setAdding(true)} className="mt-4 inline-flex min-h-10 items-center justify-center gap-1.5 rounded-lg bg-primary px-3 text-sm font-medium text-primary-fg hover:opacity-90">
+          <Plus size={18} /> {inDiners ? "Nou moviment" : "Afegir"}
+        </button>
       </aside>
 
       <main className="min-w-0 flex-1 px-4 pb-24 pt-5 md:px-8 md:pb-10 md:pt-8">
@@ -72,11 +71,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         )}
         <div className="grid auto-cols-fr grid-flow-col">
           {BAR_LEFT.map(mobileLink)}
-          {inDiners && (
-            <button onClick={() => { setMoreOpen(false); setAdding(true); }} aria-label="Nou moviment" className="grid place-items-center">
-              <span className="grid size-11 place-items-center rounded-full bg-primary text-primary-fg shadow-md"><Plus size={24} /></span>
-            </button>
-          )}
+          <button onClick={() => { setMoreOpen(false); setAdding(true); }} aria-label={inDiners ? "Nou moviment" : "Afegir"} className="grid place-items-center">
+            <span className="grid size-11 place-items-center rounded-full bg-primary text-primary-fg shadow-md"><Plus size={24} /></span>
+          </button>
           {BAR_RIGHT.map(mobileLink)}
           <button onClick={() => setMoreOpen((v) => !v)} aria-expanded={moreOpen}
             className={cx("flex min-h-14 flex-col items-center justify-center gap-0.5 text-[11px] font-medium", moreOpen || MORE.some((n) => n.section === current) ? "text-primary" : "text-muted")}>
@@ -85,7 +82,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </div>
       </nav>
 
-      {adding && <TransactionForm defaultKind={defaultKind} onClose={() => setAdding(false)} />}
+      {adding && (inDiners
+        ? <TransactionForm defaultKind={defaultKind} onClose={() => setAdding(false)} />
+        : <QuickAdd onClose={() => setAdding(false)} />)}
     </div>
   );
 }

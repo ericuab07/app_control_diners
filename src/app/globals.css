@@ -1,32 +1,36 @@
 @import "tailwindcss";
 
 :root {
-  --bg: #f4f6fa;
-  --surface: #ffffff;
-  --surface-2: #eef1f6;
-  --border: #dfe4ec;
-  --text: #131a26;
-  --muted: #647084;
-  --primary: #2f5bea;
+  --bg: #f7f3ee;
+  --surface: #fffdfa;
+  --surface-2: #f0e9e0;
+  --border: #e3d9cc;
+  --text: #2a211a;
+  --muted: #7d6e5f;
+  --primary: #b5522f;
   --primary-fg: #ffffff;
-  --income: #12925a;
-  --expense: #d43d4c;
-  --warn: #c77a08;
+  --income: #1f8a5b;
+  --expense: #c9453a;
+  --warn: #b86e00;
+  --done: #1f8a5b;
+  --done-bg: #e3f1e8;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #0d1117;
-    --surface: #161c26;
-    --surface-2: #1f2733;
-    --border: #2a3342;
-    --text: #e8ecf3;
-    --muted: #93a0b4;
-    --primary: #6f8dff;
-    --primary-fg: #0d1117;
-    --income: #3dcc8a;
-    --expense: #ff6b78;
+    --bg: #14100e;
+    --surface: #1c1713;
+    --surface-2: #261f19;
+    --border: #352a21;
+    --text: #f1e9df;
+    --muted: #a39382;
+    --primary: #d97757;
+    --primary-fg: #1a120d;
+    --income: #5fbf8f;
+    --expense: #ff7a6b;
     --warn: #f0b23e;
+    --done: #5fbf8f;
+    --done-bg: #1d3328;
   }
 }
 
@@ -42,6 +46,9 @@
   --color-income: var(--income);
   --color-expense: var(--expense);
   --color-warn: var(--warn);
+  --color-done: var(--done);
+  --color-done-bg: var(--done-bg);
+  --font-serif: Georgia, "Iowan Old Style", "Palatino Linotype", serif;
   --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 

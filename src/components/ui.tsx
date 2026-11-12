@@ -17,7 +17,7 @@ export function PageHeader({ title, subtitle, action }: { title: string; subtitl
   return (
     <header className="mb-4 flex flex-wrap items-end justify-between gap-3">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight">{title}</h1>
+        <h1 className="font-serif text-3xl font-semibold tracking-tight">{title}</h1>
         {subtitle && <p className="mt-0.5 text-sm text-muted">{subtitle}</p>}
       </div>
       {action}
@@ -101,7 +101,7 @@ export function Stat({ label, value, tone, sub, className }: { label: string; va
   return (
     <div className={cx("rounded-2xl border border-border bg-surface p-4", className)}>
       <p className="text-xs font-medium uppercase tracking-wide text-muted">{label}</p>
-      <p className={cx("num mt-1 text-xl font-semibold sm:text-2xl", tone === "income" && "text-income", tone === "expense" && "text-expense")}>{value}</p>
+      <p className={cx("num mt-1 font-serif text-xl font-semibold sm:text-2xl", tone === "income" && "text-income", tone === "expense" && "text-expense")}>{value}</p>
       {sub && <p className="mt-0.5 text-xs text-muted">{sub}</p>}
     </div>
   );

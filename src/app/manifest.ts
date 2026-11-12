@@ -7,8 +7,8 @@ export default function manifest(): MetadataRoute.Manifest {
     description: "Finances personals: balanç, ingressos, despeses, accions i pressupostos.",
     start_url: "/",
     display: "standalone",
-    background_color: "#0d1117",
-    theme_color: "#2f5bea",
+    background_color: "#14100e",
+    theme_color: "#d97757",
     lang: "ca",
     icons: [
       { src: "/icon-192.png", sizes: "192x192", type: "image/png" },

@@ -1,6 +1,6 @@
 "use client";
 
-import { Ellipsis, Plus, Settings, Sun, Wallet } from "lucide-react";
+import { Ellipsis, Flame, Plus, Settings, Sun, Wallet } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
@@ -14,6 +14,7 @@ type NavItem = { section: Section; href: string; label: string; icon: typeof Sun
 
 const NAV: NavItem[] = [
   { section: "avui", href: "/", label: "Avui", icon: Sun, mobile: "bar" },
+  { section: "habits", href: "/habits", label: "Hàbits", icon: Flame, mobile: "bar" },
   { section: "diners", href: "/diners", label: "Diners", icon: Wallet, mobile: "bar" },
   { section: "configuracio", href: "/configuracio", label: "Configuració", icon: Settings, mobile: "more" },
 ];

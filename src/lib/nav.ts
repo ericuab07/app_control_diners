@@ -1,4 +1,7 @@
-export type Section = "avui" | "diners" | "configuracio";
+export type Section = "avui" | "diners" | "habits" | "configuracio";
+
+/** Seccions d'una sola ruta base (la URL coincideix amb el nom). */
+const SIMPLE: Section[] = ["habits", "configuracio"];
 
 /** Rutes que formen el mòdul «Diners» (les URL no canvien; només el balanç es va moure a /diners). */
 export const DINERS_PATHS: readonly string[] = ["/diners", "/ingressos", "/despeses", "/accions", "/pressupostos", "/estadistiques"];
@@ -12,6 +15,5 @@ export function isDinersPath(pathname: string): boolean {
 export function sectionOf(pathname: string): Section | null {
   if (pathname === "/") return "avui";
   if (isDinersPath(pathname)) return "diners";
-  if (matches(pathname, "/configuracio")) return "configuracio";
-  return null;
+  return SIMPLE.find((s) => matches(pathname, `/${s}`)) ?? null;
 }

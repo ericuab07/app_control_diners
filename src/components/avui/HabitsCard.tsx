@@ -24,7 +24,7 @@ export function HabitsCard() {
   );
 
   return (
-    <Card className="h-full">
+    <Card>
       <div className="mb-3 flex items-center justify-between gap-2">
         <h2 className="font-serif text-xl font-semibold">Hàbits d&apos;avui</h2>
         <Link href="/habits" className="text-sm text-primary hover:underline">Tots</Link>

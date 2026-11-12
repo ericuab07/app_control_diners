@@ -59,6 +59,9 @@ docs/superpowers/specs/  document de disseny amb les decisions i el perquè
 - Hores com a text `HH:MM` (`src/lib/time.ts`); Postgres `time` torna `HH:MM:SS` i el `LifeProvider`
   ho normalitza en carregar.
 - `weekday` = 0–6 amb **0 = dilluns … 6 = diumenge** (`weekdayOf` a `calc/week.ts`), mai el `getDay()` de JS.
+- Portada «Avui» (`src/app/(app)/page.tsx`): a l'escriptori dues columnes independents (sense forats); al
+  mòbil una columna ordenada amb `order-N` (els contenidors fan `display: contents`). Classes literals: Tailwind
+  no detecta noms muntats dinàmicament.
 - Tema: `data-theme="light|dark"` a `<html>` (sense atribut = automàtic). L'script en línia de
   `src/lib/theme.ts` el posa abans de pintar. Els colors foscos són a `globals.css` dues vegades
   (fosc automàtic i fosc forçat): `tests/theme.test.ts` comprova que coincideixen. Si canvies un, canvia l'altre.

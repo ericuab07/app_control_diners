@@ -18,10 +18,10 @@ export function MoodCard() {
       await upsert("journal_entries", { date: today, mood, note: entry?.note ?? "", updated_at: new Date().toISOString() } as Partial<JournalEntry>, "user_id,date");
     });
   return (
-    <Card className="h-full">
+    <Card>
       <div className="mb-3 flex items-center justify-between gap-2">
         <h2 className="font-serif text-xl font-semibold">Com estàs avui?</h2>
-        <Link href="/diari" className="text-sm text-primary hover:underline">{entry?.note ? "Diari" : "Escriu al diari"}</Link>
+        <Link href="/diari" className="text-sm text-primary hover:underline">Diari</Link>
       </div>
       <MoodPicker value={entry?.mood ?? null} onChange={save} disabled={busy} />
       {entry?.note && <p className="mt-1 line-clamp-2 break-words text-sm italic text-muted">«{entry.note}»</p>}

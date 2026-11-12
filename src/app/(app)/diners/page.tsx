@@ -66,7 +66,8 @@ export default function DinersPage() {
         <div className="col-span-2 rounded-2xl bg-primary p-5 text-primary-fg lg:col-span-1">
           <p className="text-xs font-medium uppercase tracking-wide opacity-80">Patrimoni total</p>
           <p className="num mt-1 text-3xl font-semibold">{formatCents(cash + portfolio.valueCents)}</p>
-          <p className="num mt-1 text-sm opacity-85">Comptes {formatCents(cash)} · Accions {formatCents(portfolio.valueCents)}</p>
+          <p className="num mt-1 text-sm opacity-85">Comptes {formatCents(cash)}</p>
+          <p className="num text-sm opacity-85">Accions {formatCents(portfolio.valueCents)}</p>
         </div>
         <Stat label="Ingressos del mes" value={formatCents(monthTotals.income)} tone="income" />
         <Stat label="Despeses del mes" value={formatCents(monthTotals.expense)} tone="expense" />

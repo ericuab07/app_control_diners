@@ -28,7 +28,7 @@ export function MoneyCard() {
   const alerts = useMemo(() => budgetStatuses(budgets, transactions, month, todayISO()).filter((s) => s.level !== "ok").length, [budgets, transactions, month]);
 
   return (
-    <Card className="h-full">
+    <Card>
       <div className="mb-3 flex items-center justify-between gap-2">
         <h2 className="flex items-center gap-2 font-semibold"><Wallet size={18} className="text-primary" aria-hidden /> Diners</h2>
         <Link href="/diners" className="text-sm text-primary hover:underline">Veure diners</Link>

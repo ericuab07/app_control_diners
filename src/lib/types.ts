@@ -125,3 +125,31 @@ export interface Countdown {
   target_date: string;
   archived: boolean;
 }
+
+export interface Habit {
+  id: string;
+  name: string;
+  icon: string;
+  /** Cops per setmana (1–7); 7 = diari. */
+  target_per_week: number;
+  archived: boolean;
+}
+
+/** Que existeixi la fila vol dir que l'hàbit es va fer aquell dia. */
+export interface HabitLog {
+  id: string;
+  habit_id: string;
+  date: string;
+}
+
+export type Workout = "done" | "rest";
+
+/** Una fila per dia amb els números de salut. */
+export interface HealthLog {
+  id: string;
+  date: string;
+  sleep_minutes: number | null;
+  steps: number | null;
+  water_glasses: number;
+  workout: Workout | null;
+}

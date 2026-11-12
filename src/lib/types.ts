@@ -153,3 +153,39 @@ export interface HealthLog {
   water_glasses: number;
   workout: Workout | null;
 }
+
+/** Objectiu de l'any (p. ex. 24 llibres). */
+export interface Goal {
+  id: string;
+  title: string;
+  year: number;
+  target_value: number;
+  current_value: number;
+  unit: string;
+}
+
+export interface Course {
+  id: string;
+  name: string;
+  color: string;
+  semester: string;
+  archived: boolean;
+}
+
+export type StudyKind = "entrega" | "examen" | "estudi";
+
+export interface StudyItem {
+  id: string;
+  course_id: string;
+  title: string;
+  kind: StudyKind;
+  due_date: string;
+  done: boolean;
+}
+
+export interface StudyLog {
+  id: string;
+  course_id: string;
+  date: string;
+  minutes: number;
+}

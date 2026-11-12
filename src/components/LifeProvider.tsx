@@ -5,23 +5,26 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 import { addDaysISO, todayISO } from "@/lib/dates";
 import { DEFAULT_SETTINGS } from "@/lib/defaults";
 import { supabase } from "@/lib/supabase";
-import type { Countdown, LifeEvent, Settings, Task } from "@/lib/types";
+import type { Countdown, Habit, HabitLog, HealthLog, LifeEvent, Settings, Task } from "@/lib/types";
 
 /** Taules del panell de vida que es carreguen en memòria. */
 export interface LifeTables {
   tasks: Task;
   events: LifeEvent;
   countdowns: Countdown;
+  habits: Habit;
+  habit_logs: HabitLog;
+  health_logs: HealthLog;
 }
 export type LifeTable = keyof LifeTables;
 type State = { [K in LifeTable]: LifeTables[K][] };
 
-const EMPTY: State = { tasks: [], events: [], countdowns: [] };
+const EMPTY: State = { tasks: [], events: [], countdowns: [], habits: [], habit_logs: [], health_logs: [] };
 const PAGE = 1000;
 /** Dies d'historial que es carreguen de les taules diàries. */
 const HISTORY_DAYS = 400;
 /** Taules amb columna `date` que només es carreguen des de fa HISTORY_DAYS dies. */
-const DATED: LifeTable[] = ["tasks"];
+const DATED: LifeTable[] = ["tasks", "habit_logs", "health_logs"];
 /** Columnes `time` de Postgres ("HH:MM:SS") que es treballen com a "HH:MM". */
 const TIMES: Partial<Record<LifeTable, string[]>> = { events: ["start_time", "end_time"] };
 
@@ -61,6 +64,8 @@ export interface LifeContext extends State {
   insert: <K extends LifeTable>(table: K, rows: Partial<LifeTables[K]> | Partial<LifeTables[K]>[]) => Promise<LifeTables[K][]>;
   update: <K extends LifeTable>(table: K, id: string, patch: Partial<LifeTables[K]>) => Promise<void>;
   remove: (table: LifeTable, id: string) => Promise<void>;
+  /** Insereix o substitueix per la clau única `onConflict` (p. ex. "user_id,date"). */
+  upsert: <K extends LifeTable>(table: K, row: Partial<LifeTables[K]>, onConflict: string) => Promise<LifeTables[K]>;
 }
 
 const Ctx = createContext<LifeContext | null>(null);
@@ -81,16 +86,19 @@ export function LifeProvider({ session, children }: { session: Session; children
   const reload = useCallback(async () => {
     try {
       const since = addDaysISO(todayISO(), -HISTORY_DAYS);
-      const [settingsRes, tasks, events, countdowns] = await Promise.all([
+      const [settingsRes, tasks, events, countdowns, habits, habit_logs, health_logs] = await Promise.all([
         supabase.from("settings").select("*").maybeSingle(),
         fetchAll("tasks", since),
         fetchAll("events", since),
         fetchAll("countdowns", since),
+        fetchAll("habits", since),
+        fetchAll("habit_logs", since),
+        fetchAll("health_logs", since),
       ]);
       if (settingsRes.error) throw new Error(settingsRes.error.message);
       // Sense fila (primera sessió): valors per defecte, sense escriure res.
       setSettings(pickSettings(settingsRes.data));
-      setState({ tasks, events, countdowns });
+      setState({ tasks, events, countdowns, habits, habit_logs, health_logs });
       setStatus("ready");
     } catch (e) {
       setErrorMsg(e instanceof Error ? e.message : String(e));
@@ -137,12 +145,29 @@ export function LifeProvider({ session, children }: { session: Session; children
   const remove = useCallback<LifeContext["remove"]>(async (table, id) => {
     const { error } = await supabase.from(table).delete().eq("id", id);
     if (error) throw new Error(error.message);
-    setState((s) => ({ ...s, [table]: (s[table] as { id: string }[]).filter((r) => r.id !== id) }));
+    setState((s) => {
+      const next = { ...s, [table]: (s[table] as { id: string }[]).filter((r) => r.id !== id) };
+      // Esborrar un hàbit esborra els seus registres a la BD (cascade): també a l'estat.
+      if (table === "habits") next.habit_logs = s.habit_logs.filter((l) => l.habit_id !== id);
+      return next;
+    });
+  }, []);
+
+  const upsert = useCallback<LifeContext["upsert"]>(async (table, row, onConflict) => {
+    const { data, error } = await supabase.from(table).upsert(row as never, { onConflict }).select().single();
+    if (error) throw new Error(error.message);
+    const saved = normalize(table, data as Record<string, unknown>);
+    const id = (saved as { id: string }).id;
+    setState((s) => {
+      const rows = s[table] as { id: string }[];
+      return { ...s, [table]: rows.some((r) => r.id === id) ? rows.map((r) => (r.id === id ? saved : r)) : [...rows, saved] };
+    });
+    return saved;
   }, []);
 
   const value = useMemo<LifeContext>(
-    () => ({ ...state, settings, saveSettings, insert, update, remove }),
-    [state, settings, saveSettings, insert, update, remove],
+    () => ({ ...state, settings, saveSettings, insert, update, remove, upsert }),
+    [state, settings, saveSettings, insert, update, remove, upsert],
   );
 
   if (status === "loading") {

@@ -36,6 +36,13 @@ const db = {
     at({ title: "Viatge a Roma", emoji: "✈️", start_date: addDays(-26), target_date: addDays(39), archived: false }),
     at({ title: "Parcial d'ER", emoji: "📚", start_date: addDays(-10), target_date: addDays(4), archived: false }),
   ],
+  habits: [
+    at({ name: "Llegir 20 minuts", icon: "📖", target_per_week: 7, archived: false }),
+    at({ name: "Gimnàs", icon: "🏋️", target_per_week: 3, archived: false }),
+    at({ name: "Meditar", icon: "🧘", target_per_week: 7, archived: false }),
+  ],
+  habit_logs: [],
+  health_logs: [at({ date: today, sleep_minutes: 420, steps: 5400, water_glasses: 5, workout: null, updated_at: new Date().toISOString() })],
   accounts: [
     at({ name: "Compte corrent", type: "checking", initial_balance_cents: 125000, color: "#2563eb", archived: false }),
     at({ name: "Estalvis", type: "savings", initial_balance_cents: 340000, color: "#16a34a", archived: false }),
@@ -47,6 +54,8 @@ const db = {
   trades: [],
   price_cache: [],
 };
+for (let i = 1; i <= 6; i++) db.habit_logs.push(at({ habit_id: db.habits[0].id, date: addDays(-i) }));
+db.habit_logs.push(at({ habit_id: db.habits[1].id, date: addDays(-1) }), at({ habit_id: db.habits[2].id, date: today }));
 db.transactions.push(
   at({ account_id: db.accounts[0].id, kind: "income", amount_cents: 90000, date: addDays(-8), description: "Nòmina", category_id: null, transfer_account_id: null, recurring_rule_id: null }),
   at({ account_id: db.accounts[0].id, kind: "expense", amount_cents: 4320, date: addDays(-2), description: "Supermercat", category_id: null, transfer_account_id: null, recurring_rule_id: null }),
@@ -118,7 +127,8 @@ createServer(async (req, res) => {
     const conflict = url.searchParams.get("on_conflict");
     const out = [];
     for (const row of list) {
-      const existing = conflict === "user_id" ? table[0] : undefined;
+      const keys = conflict ? conflict.split(",").map((k) => (k === "user_id" ? null : k)).filter(Boolean) : null;
+      const existing = keys ? table.find((r) => keys.every((k) => String(r[k]) === String(row[k]))) : undefined;
       if (existing) { Object.assign(existing, row); out.push(existing); continue; }
       if (m[1] === "tasks" && row.top_rank != null && table.some((t) => t.date === row.date && t.top_rank === row.top_rank)) {
         return send(res, 409, { message: 'duplicate key value violates unique constraint "tasks_user_date_rank_key"' });

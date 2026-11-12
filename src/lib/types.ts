@@ -106,3 +106,22 @@ export interface LifeEvent {
   weekday: number | null;
   repeat_until: string | null;
 }
+
+/** Tasca d'un dia; `top_rank` 1–3 la fa una de «les 3 d'avui». */
+export interface Task {
+  id: string;
+  title: string;
+  date: string;
+  top_rank: 1 | 2 | 3 | null;
+  done: boolean;
+  done_at: string | null;
+}
+
+export interface Countdown {
+  id: string;
+  title: string;
+  emoji: string;
+  start_date: string;
+  target_date: string;
+  archived: boolean;
+}

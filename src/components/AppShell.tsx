@@ -1,6 +1,6 @@
 "use client";
 
-import { Ellipsis, Flame, GraduationCap, Plus, Settings, Sun, Target, Wallet } from "lucide-react";
+import { Ellipsis, Flame, GraduationCap, NotebookPen, Plus, Settings, Sun, Target, Wallet } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
@@ -17,6 +17,7 @@ const NAV: NavItem[] = [
   { section: "habits", href: "/habits", label: "Hàbits", icon: Flame, mobile: "bar" },
   { section: "objectius", href: "/objectius", label: "Objectius", icon: Target, mobile: "bar" },
   { section: "estudis", href: "/estudis", label: "Estudis", icon: GraduationCap, mobile: "more" },
+  { section: "diari", href: "/diari", label: "Diari", icon: NotebookPen, mobile: "more" },
   { section: "diners", href: "/diners", label: "Diners", icon: Wallet, mobile: "more" },
   { section: "configuracio", href: "/configuracio", label: "Configuració", icon: Settings, mobile: "more" },
 ];

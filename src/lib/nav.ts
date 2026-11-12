@@ -1,7 +1,7 @@
-export type Section = "avui" | "diners" | "habits" | "objectius" | "estudis" | "configuracio";
+export type Section = "avui" | "diners" | "habits" | "objectius" | "estudis" | "diari" | "configuracio";
 
 /** Seccions d'una sola ruta base (la URL coincideix amb el nom). */
-const SIMPLE: Section[] = ["habits", "objectius", "estudis", "configuracio"];
+const SIMPLE: Section[] = ["habits", "objectius", "estudis", "diari", "configuracio"];
 
 /** Rutes que formen el mòdul «Diners» (les URL no canvien; només el balanç es va moure a /diners). */
 export const DINERS_PATHS: readonly string[] = ["/diners", "/ingressos", "/despeses", "/accions", "/pressupostos", "/estadistiques"];

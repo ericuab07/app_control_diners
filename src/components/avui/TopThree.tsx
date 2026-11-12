@@ -2,6 +2,7 @@
 
 import { Check, Plus, Trash2 } from "lucide-react";
 import { useMemo, useState } from "react";
+import { quoteOfDay } from "@/lib/calc/journal";
 import { QUOTES } from "@/lib/defaults";
 import type { Task } from "@/lib/types";
 import { useLife } from "../LifeProvider";
@@ -25,7 +26,7 @@ export function TopThree() {
   const del = (t: Task) => confirm(`Vols esborrar «${t.title}»?`) && void run(() => remove("tasks", t.id));
 
   return (
-    <Card className="h-full">
+    <Card>
       <h2 className="mb-3 font-serif text-xl font-semibold">Les 3 d&apos;avui</h2>
       <ol className="space-y-2">
         {([1, 2, 3] as const).map((rank) => {
@@ -54,7 +55,7 @@ export function TopThree() {
         })}
       </ol>
       <ErrorNote message={error} />
-      <blockquote className="mt-4 border-l-2 border-primary pl-3 font-serif text-sm italic text-muted">{QUOTES[0]}</blockquote>
+      <blockquote className="mt-4 border-l-2 border-primary pl-3 font-serif text-sm italic text-muted">{quoteOfDay(today, QUOTES)}</blockquote>
       {adding && <TaskForm onClose={() => setAdding(false)} />}
     </Card>
   );

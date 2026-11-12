@@ -5,7 +5,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 import { addDaysISO, todayISO } from "@/lib/dates";
 import { DEFAULT_SETTINGS } from "@/lib/defaults";
 import { supabase } from "@/lib/supabase";
-import type { Countdown, Course, Goal, Habit, HabitLog, HealthLog, JournalEntry, LifeEvent, Settings, StudyItem, StudyLog, Task } from "@/lib/types";
+import type { Countdown, Course, Goal, Habit, HabitLog, HealthLog, InboxItem, JournalEntry, LifeEvent, Settings, StudyItem, StudyLog, Task } from "@/lib/types";
 
 /** Taules del panell de vida que es carreguen en memòria. */
 export interface LifeTables {
@@ -20,11 +20,12 @@ export interface LifeTables {
   study_items: StudyItem;
   study_logs: StudyLog;
   journal_entries: JournalEntry;
+  inbox_items: InboxItem;
 }
 export type LifeTable = keyof LifeTables;
 type State = { [K in LifeTable]: LifeTables[K][] };
 
-const EMPTY: State = { tasks: [], events: [], countdowns: [], habits: [], habit_logs: [], health_logs: [], goals: [], courses: [], study_items: [], study_logs: [], journal_entries: [] };
+const EMPTY: State = { tasks: [], events: [], countdowns: [], habits: [], habit_logs: [], health_logs: [], goals: [], courses: [], study_items: [], study_logs: [], journal_entries: [], inbox_items: [] };
 const PAGE = 1000;
 /** Dies d'historial que es carreguen de les taules diàries. */
 const HISTORY_DAYS = 400;
@@ -94,7 +95,7 @@ export function LifeProvider({ session, children }: { session: Session; children
   const reload = useCallback(async () => {
     try {
       const since = addDaysISO(todayISO(), -HISTORY_DAYS);
-      const [settingsRes, tasks, events, countdowns, habits, habit_logs, health_logs, goals, courses, study_items, study_logs, journal_entries] = await Promise.all([
+      const [settingsRes, tasks, events, countdowns, habits, habit_logs, health_logs, goals, courses, study_items, study_logs, journal_entries, inbox_items] = await Promise.all([
         supabase.from("settings").select("*").maybeSingle(),
         fetchAll("tasks", since),
         fetchAll("events", since),
@@ -107,11 +108,12 @@ export function LifeProvider({ session, children }: { session: Session; children
         fetchAll("study_items", since),
         fetchAll("study_logs", since),
         fetchAll("journal_entries", since),
+        fetchAll("inbox_items", since),
       ]);
       if (settingsRes.error) throw new Error(settingsRes.error.message);
       // Sense fila (primera sessió): valors per defecte, sense escriure res.
       setSettings(pickSettings(settingsRes.data));
-      setState({ tasks, events, countdowns, habits, habit_logs, health_logs, goals, courses, study_items, study_logs, journal_entries });
+      setState({ tasks, events, countdowns, habits, habit_logs, health_logs, goals, courses, study_items, study_logs, journal_entries, inbox_items });
       setStatus("ready");
     } catch (e) {
       setErrorMsg(e instanceof Error ? e.message : String(e));

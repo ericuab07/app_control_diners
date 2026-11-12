@@ -199,3 +199,10 @@ export interface JournalEntry {
   mood: Mood;
   note: string;
 }
+
+/** Apunt ràpid de la safata d'entrada (es classifica després). */
+export interface InboxItem {
+  id: string;
+  text: string;
+  created_at: string;
+}

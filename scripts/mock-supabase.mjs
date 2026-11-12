@@ -26,6 +26,7 @@ const db = {
     at({ title: "Repassar el tema 3 d'ER", date: today, top_rank: 1, done: true, done_at: new Date().toISOString() }),
     at({ title: "Enviar la pràctica d'Estructura de Dades", date: today, top_rank: 2, done: false, done_at: null }),
     at({ title: "Trucar a l'àvia", date: today, top_rank: 3, done: false, done_at: null }),
+    at({ title: "Revisar apunts de Física", date: addDays(-1), top_rank: 1, done: false, done_at: null }),
   ],
   events: [
     at({ title: "Estructura de Dades", start_time: hhmm(Math.max(0, nowMin - 180)), end_time: hhmm(Math.max(30, nowMin - 90)), kind: "class", date: null, weekday, repeat_until: null }),
@@ -55,6 +56,7 @@ const db = {
   study_items: [],
   study_logs: [],
   journal_entries: [],
+  inbox_items: [at({ text: "Comprar llet i ous" }), at({ text: "Idea: fer el TFG sobre visualització de dades" })],
   accounts: [
     at({ name: "Compte corrent", type: "checking", initial_balance_cents: 125000, color: "#2563eb", archived: false }),
     at({ name: "Estalvis", type: "savings", initial_balance_cents: 340000, color: "#16a34a", archived: false }),

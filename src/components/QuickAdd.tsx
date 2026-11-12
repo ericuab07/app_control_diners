@@ -1,17 +1,19 @@
 "use client";
 
-import { BookOpen, CalendarPlus, Clock, Flame, ListChecks } from "lucide-react";
+import { BookOpen, CalendarPlus, Clock, Flame, ListChecks, StickyNote } from "lucide-react";
 import { useState } from "react";
 import { EventForm } from "./avui/EventForm";
 import { TaskForm } from "./avui/TaskForm";
 import { HabitForm } from "./habits/HabitForm";
+import { QuickNoteModal } from "./inbox/QuickNoteModal";
 import { StudyItemForm } from "./study/StudyItemForm";
 import { StudyLogForm } from "./study/StudyLogForm";
 import { Modal } from "./ui";
 
-type Choice = "task" | "event" | "habit" | "study" | "studyLog";
+type Choice = "note" | "task" | "event" | "habit" | "study" | "studyLog";
 
 const OPTIONS: { id: Choice; label: string; hint: string; icon: typeof ListChecks }[] = [
+  { id: "note", label: "Apunt ràpid", hint: "Apunta-ho ara i ja ho classificaràs", icon: StickyNote },
   { id: "task", label: "Nova prioritat d'avui", hint: "Una de les 3 coses que vols fer avui", icon: ListChecks },
   { id: "event", label: "Nou esdeveniment", hint: "Classe, feina o pla a l'agenda", icon: CalendarPlus },
   { id: "habit", label: "Nou hàbit", hint: "Una cosa petita per repetir cada setmana", icon: Flame },
@@ -22,6 +24,7 @@ const OPTIONS: { id: Choice; label: string; hint: string; icon: typeof ListCheck
 /** Botó «+» fora de Diners: tria què vols afegir. */
 export function QuickAdd({ onClose }: { onClose: () => void }) {
   const [choice, setChoice] = useState<Choice | null>(null);
+  if (choice === "note") return <QuickNoteModal onClose={onClose} />;
   if (choice === "task") return <TaskForm onClose={onClose} />;
   if (choice === "event") return <EventForm onClose={onClose} />;
   if (choice === "habit") return <HabitForm onClose={onClose} />;

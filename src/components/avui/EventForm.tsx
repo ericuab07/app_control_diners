@@ -24,9 +24,9 @@ function dateForWeekday(weekday: number): string {
   return addDaysISO(today, (weekday - weekdayOf(today) + 7) % 7);
 }
 
-export function EventForm({ existing, onClose }: { existing?: LifeEvent; onClose: () => void }) {
+export function EventForm({ existing, onClose, initialTitle = "", onSaved }: { existing?: LifeEvent; onClose: () => void; initialTitle?: string; onSaved?: () => Promise<void> }) {
   const { insert, update, remove } = useLife();
-  const [title, setTitle] = useState(existing?.title ?? "");
+  const [title, setTitle] = useState(existing?.title ?? initialTitle);
   const [kind, setKind] = useState<EventKind>(existing?.kind ?? "class");
   const [start, setStart] = useState(existing?.start_time ?? "09:00");
   const [end, setEnd] = useState(existing?.end_time ?? "10:00");
@@ -48,6 +48,7 @@ export function EventForm({ existing, onClose }: { existing?: LifeEvent; onClose
     void run(async () => {
       if (existing) await update("events", existing.id, row);
       else await insert("events", row);
+      await onSaved?.();
       onClose();
     });
   };

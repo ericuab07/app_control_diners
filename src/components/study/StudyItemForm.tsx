@@ -8,11 +8,11 @@ import { Button, ErrorNote, Field, inputClass, Modal, Segmented, useAction } fro
 
 export const STUDY_KIND_LABELS: Record<StudyKind, string> = { entrega: "Entrega", examen: "Examen", estudi: "Estudi" };
 
-export function StudyItemForm({ existing, defaultCourseId, onClose }: { existing?: StudyItem; defaultCourseId?: string; onClose: () => void }) {
+export function StudyItemForm({ existing, defaultCourseId, onClose, initialTitle = "", onSaved }: { existing?: StudyItem; defaultCourseId?: string; onClose: () => void; initialTitle?: string; onSaved?: () => Promise<void> }) {
   const { courses, insert, update, remove } = useLife();
   const active = courses.filter((c) => !c.archived || c.id === existing?.course_id);
   const [courseId, setCourseId] = useState(existing?.course_id ?? defaultCourseId ?? active[0]?.id ?? "");
-  const [title, setTitle] = useState(existing?.title ?? "");
+  const [title, setTitle] = useState(existing?.title ?? initialTitle);
   const [kind, setKind] = useState<StudyKind>(existing?.kind ?? "entrega");
   const [due, setDue] = useState(existing?.due_date ?? todayISO());
   const { busy, error, setError, run } = useAction();
@@ -32,6 +32,7 @@ export function StudyItemForm({ existing, defaultCourseId, onClose }: { existing
     void run(async () => {
       if (existing) await update("study_items", existing.id, row);
       else await insert("study_items", row);
+      await onSaved?.();
       onClose();
     });
   };

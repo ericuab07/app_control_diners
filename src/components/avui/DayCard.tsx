@@ -1,11 +1,12 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { dayProgress } from "@/lib/calc/dayProgress";
 import { doneDates, isDueOn } from "@/lib/calc/habits";
 import { healthItems } from "@/lib/calc/health";
 import { useLife } from "../LifeProvider";
 import { Card } from "../ui";
+import { CloseDaySheet } from "./CloseDaySheet";
 import { ProgressRing } from "./ProgressRing";
 import { useNow } from "./useNow";
 
@@ -13,6 +14,7 @@ import { useNow } from "./useNow";
 export function DayCard() {
   const { tasks, habits, habit_logs, health_logs, settings } = useLife();
   const { today } = useNow();
+  const [closing, setClosing] = useState(false);
   const progress = useMemo(() => {
     const habitItems = habits
       .filter((h) => !h.archived)
@@ -26,13 +28,17 @@ export function DayCard() {
     ]);
   }, [tasks, habits, habit_logs, health_logs, settings, today]);
   return (
+    <>
     <Card className="flex h-full items-center gap-5">
       <ProgressRing ratio={progress.ratio} caption={progress.label} size={112} />
       <div className="min-w-0">
         <h2 className="text-xs font-medium uppercase tracking-wide text-muted">El teu dia</h2>
         <p className="mt-1 font-serif text-2xl font-semibold leading-tight lg:text-xl">{progress.label}</p>
         <p className="num mt-1 text-sm text-muted">{progress.done} de {progress.total} coses fetes</p>
+        <button onClick={() => setClosing(true)} className="mt-2 text-sm font-medium text-primary hover:underline">Tanca el dia</button>
       </div>
     </Card>
+    {closing && <CloseDaySheet today={today} onClose={() => setClosing(false)} />}
+    </>
   );
 }

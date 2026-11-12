@@ -1,11 +1,14 @@
 "use client";
 
 import { AgendaCard } from "@/components/avui/AgendaCard";
+import { CloseDayCard } from "@/components/avui/CloseDayCard";
 import { CountdownsCard } from "@/components/avui/CountdownsCard";
 import { DayCard } from "@/components/avui/DayCard";
 import { GoalsCard } from "@/components/avui/GoalsCard";
 import { GreetingHeader } from "@/components/avui/GreetingHeader";
 import { HabitsCard } from "@/components/avui/HabitsCard";
+import { InboxCard } from "@/components/avui/InboxCard";
+import { LeftoversBanner } from "@/components/avui/LeftoversBanner";
 import { MoneyCard } from "@/components/avui/MoneyCard";
 import { MoodCard } from "@/components/avui/MoodCard";
 import { NumbersCard } from "@/components/avui/NumbersCard";
@@ -19,8 +22,8 @@ const ITEM = "lg:order-none empty:hidden";
 /**
  * Portada «Avui».
  * Escriptori: dues columnes independents que s'omplen de dalt a baix sense forats.
- *   Esquerra (ampla): agenda, properes entregues, [el teu dia | números], [comptes enrere | objectius].
- *   Dreta: les 3, com estàs, hàbits, diners.
+ *   Esquerra (ampla): pendents d'ahir, agenda, properes entregues, [el teu dia | números], [comptes enrere | objectius].
+ *   Dreta: tanca el dia (vespre), les 3, apunts, com estàs, hàbits, diners.
  * Mòbil: una sola columna en l'ordre dels `order-N` (els contenidors fan `display: contents`).
  */
 export default function AvuiPage() {
@@ -30,22 +33,25 @@ export default function AvuiPage() {
       <WeekFocus />
       <div className="mt-6 flex flex-col gap-4 lg:grid lg:grid-cols-6 lg:items-start">
         <div className="contents lg:col-span-4 lg:flex lg:flex-col lg:gap-4">
-          <div className={`order-4 ${ITEM}`}><AgendaCard /></div>
-          <div className={`order-5 ${ITEM}`}><StudyCard /></div>
+          <div className={`order-1 ${ITEM}`}><LeftoversBanner /></div>
+          <div className={`order-6 ${ITEM}`}><AgendaCard /></div>
+          <div className={`order-7 ${ITEM}`}><StudyCard /></div>
           <div className="contents lg:grid lg:grid-cols-2 lg:gap-4">
-            <div className={`order-1 ${ITEM}`}><DayCard /></div>
-            <div className={`order-6 ${ITEM}`}><NumbersCard /></div>
+            <div className={`order-3 ${ITEM}`}><DayCard /></div>
+            <div className={`order-8 ${ITEM}`}><NumbersCard /></div>
           </div>
           <div className="contents lg:grid lg:grid-cols-2 lg:gap-4">
-            <div className={`order-8 ${ITEM}`}><CountdownsCard /></div>
-            <div className={`order-9 ${ITEM}`}><GoalsCard /></div>
+            <div className={`order-10 ${ITEM}`}><CountdownsCard /></div>
+            <div className={`order-11 ${ITEM}`}><GoalsCard /></div>
           </div>
         </div>
         <div className="contents lg:col-span-2 lg:flex lg:flex-col lg:gap-4">
-          <div className={`order-2 ${ITEM}`}><TopThree /></div>
-          <div className={`order-3 ${ITEM}`}><MoodCard /></div>
-          <div className={`order-7 ${ITEM}`}><HabitsCard /></div>
-          <div className={`order-10 ${ITEM}`}><MoneyCard /></div>
+          <div className={`order-2 ${ITEM}`}><CloseDayCard /></div>
+          <div className={`order-4 ${ITEM}`}><TopThree /></div>
+          <div className={`order-5 ${ITEM}`}><InboxCard /></div>
+          <div className={`order-9 ${ITEM}`}><MoodCard /></div>
+          <div className={`order-9 ${ITEM}`}><HabitsCard /></div>
+          <div className={`order-12 ${ITEM}`}><MoneyCard /></div>
         </div>
       </div>
     </>

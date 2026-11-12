@@ -1,7 +1,17 @@
 "use client";
 
-import { PageHeader } from "@/components/ui";
+import { GreetingHeader } from "@/components/avui/GreetingHeader";
+import { MoneyCard } from "@/components/avui/MoneyCard";
+import { WeekFocus } from "@/components/avui/WeekFocus";
 
 export default function AvuiPage() {
-  return <PageHeader title="Avui" />;
+  return (
+    <>
+      <GreetingHeader />
+      <WeekFocus />
+      <div className="mt-6 grid gap-4">
+        <MoneyCard />
+      </div>
+    </>
+  );
 }

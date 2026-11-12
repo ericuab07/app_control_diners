@@ -4,11 +4,13 @@ import { useState } from "react";
 import { AccountsSection } from "@/components/settings/AccountsSection";
 import { CategoriesSection } from "@/components/settings/CategoriesSection";
 import { DataSection } from "@/components/settings/DataSection";
+import { ProfileSection } from "@/components/settings/ProfileSection";
 import { ImportSection } from "@/components/settings/ImportSection";
 import { RecurringSection } from "@/components/settings/RecurringSection";
 import { cx, PageHeader } from "@/components/ui";
 
 const TABS = [
+  { id: "profile", label: "Perfil", Component: ProfileSection },
   { id: "accounts", label: "Comptes", Component: AccountsSection },
   { id: "categories", label: "Categories", Component: CategoriesSection },
   { id: "recurring", label: "Recurrents", Component: RecurringSection },
@@ -17,7 +19,7 @@ const TABS = [
 ] as const;
 
 export default function SettingsPage() {
-  const [tab, setTab] = useState<(typeof TABS)[number]["id"]>("accounts");
+  const [tab, setTab] = useState<(typeof TABS)[number]["id"]>("profile");
   const Active = TABS.find((t) => t.id === tab)!.Component;
   return (
     <>

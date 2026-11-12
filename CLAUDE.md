@@ -1,6 +1,6 @@
-# Control de diners
+# Panell de vida (abans «Control de diners»)
 
-App de finances personals (un usuari) en català. Aquest fitxer és el quadern de seguiment:
+Panell de vida personal (un usuari) en català: portada «Avui» amb el dia i la vida; els diners són un mòdul més. Aquest fitxer és el quadern de seguiment:
 **actualitza'l al final de cada sessió** (seccions «Estat» i «Pendent»).
 
 @AGENTS.md
@@ -26,10 +26,12 @@ npm run build    # compilació de producció (inclou comprovació de tipus)
 - **Única ruta de servidor:** `src/app/api/quotes/route.ts` (cotitzacions de Yahoo Finance; exigeix sessió).
 
 ```
-src/lib/calc/        lògica pura i testada: balances, budgets, stats, recurring, portfolio, csv
-src/lib/             types, money (cèntims), dates (ISO YYYY-MM-DD), defaults, supabase
-src/components/      DataProvider, AppShell (navegació), TransactionForm/List, ui, settings/*
-src/app/(app)/       pàgines amb sessió: / (balanç), ingressos, despeses, accions,
+src/lib/calc/        lògica pura i testada: balances, budgets, stats, recurring, portfolio, csv,
+                     week (setmana, focus)
+src/lib/             types, money (cèntims), dates (ISO YYYY-MM-DD), time (HH:MM), nav, defaults, supabase
+src/components/      DataProvider, LifeProvider, AppShell (navegació), DinersTabs, TransactionForm/List,
+                     ui, settings/* (Perfil inclòs), avui/* (targetes de la portada)
+src/app/(app)/       pàgines amb sessió: / (Avui), diners (balanç), ingressos, despeses, accions,
                      pressupostos, estadistiques, configuracio
 src/app/login/       inici de sessió i registre
 supabase/migrations/ esquema SQL (ja aplicat al projecte)
@@ -45,7 +47,15 @@ docs/superpowers/specs/  document de disseny amb les decisions i el perquè
 - Text de la interfície en català. Colors via variables CSS de `globals.css` (clar i fosc automàtic).
 - Canvis d'esquema: fitxer nou a `supabase/migrations/` i aplicar-lo amb el connector de Supabase.
 
-## Estat (2026-11-10)
+## Estat (2026-11-12)
+
+Panell de vida en curs (spec `docs/superpowers/specs/2026-11-12-panell-de-vida-design.md`):
+
+- [x] **Fase 0 · Base:** pell editorial (fosc càlid, terracota, serif), navegació Avui/Diners, balanç a
+      `/diners`, taula `settings` + `LifeProvider`, portada amb salutació, focus de la setmana, targeta de
+      diners i pestanya «Perfil» (nom i metes).
+
+### v1 de diners (2026-11-10)
 
 v1 completa i provada de punta a punta en navegador contra el Supabase real:
 
@@ -62,12 +72,25 @@ v1 completa i provada de punta a punta en navegador contra el Supabase real:
 
 ## Pendent
 
+- [ ] **Prova a mà del panell** (no hi ha contrasenya de l'usuari de proves a la sessió de Claude):
+      iniciar sessió, desar el focus i el perfil, veure la targeta de diners, i navegar per les pestanyes de
+      Diners (incloent mòbil i fosc).
+- [ ] Supabase avisa «Leaked password protection disabled» (Auth → Providers → Email). Activar-ho és
+      opcional; no s'ha tocat perquè és configuració d'Auth.
+
 - [ ] **Desplegar a Vercel** (encara no està publicada). Després, a Supabase → Authentication → URL
       Configuration, posar la URL de producció com a «Site URL» perquè l'enllaç del correu de
       confirmació del registre hi apunti (ara apunta a localhost).
 - [ ] Esborrar l'usuari de proves `e2e-test@example.com` de Supabase (Authentication → Users). No té dades.
 - [ ] Idees: historial del valor de la cartera, dividends, importar Excel, regles de categorització
       editables, mode fora de línia, selector manual de tema clar/fosc.
+
+## Skills utilitzades
+
+- `find-skills`: cerca de skills a l'inici de cada fase.
+- `supabase-postgres-best-practices` (oficial de Supabase, instal·lada amb `npx skills add supabase/agent-skills`):
+  polítiques RLS amb `(select auth.uid())`, índexs a les FK i a `user_id`, restriccions `check`.
+- `superpowers:executing-plans` / `test-driven-development`: execució tasca a tasca amb test en vermell primer.
 
 ## Limitacions conegudes
 

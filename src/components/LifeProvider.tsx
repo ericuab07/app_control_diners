@@ -2,9 +2,48 @@
 
 import type { Session } from "@supabase/supabase-js";
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { addDaysISO, todayISO } from "@/lib/dates";
 import { DEFAULT_SETTINGS } from "@/lib/defaults";
 import { supabase } from "@/lib/supabase";
-import type { Settings } from "@/lib/types";
+import type { Countdown, LifeEvent, Settings, Task } from "@/lib/types";
+
+/** Taules del panell de vida que es carreguen en memòria. */
+export interface LifeTables {
+  tasks: Task;
+  events: LifeEvent;
+  countdowns: Countdown;
+}
+export type LifeTable = keyof LifeTables;
+type State = { [K in LifeTable]: LifeTables[K][] };
+
+const EMPTY: State = { tasks: [], events: [], countdowns: [] };
+const PAGE = 1000;
+/** Dies d'historial que es carreguen de les taules diàries. */
+const HISTORY_DAYS = 400;
+/** Taules amb columna `date` que només es carreguen des de fa HISTORY_DAYS dies. */
+const DATED: LifeTable[] = ["tasks"];
+/** Columnes `time` de Postgres ("HH:MM:SS") que es treballen com a "HH:MM". */
+const TIMES: Partial<Record<LifeTable, string[]>> = { events: ["start_time", "end_time"] };
+
+function normalize<K extends LifeTable>(table: K, row: Record<string, unknown>): LifeTables[K] {
+  for (const col of TIMES[table] ?? []) if (typeof row[col] === "string") row[col] = (row[col] as string).slice(0, 5);
+  return row as unknown as LifeTables[K];
+}
+
+async function fetchAll<K extends LifeTable>(table: K, since: string): Promise<LifeTables[K][]> {
+  const out: LifeTables[K][] = [];
+  for (let from = 0; ; from += PAGE) {
+    let q = supabase.from(table).select("*");
+    if (DATED.includes(table)) q = q.gte("date", since);
+    const { data, error } = await q
+      .order("created_at", { ascending: true })
+      .order("id", { ascending: true })
+      .range(from, from + PAGE - 1);
+    if (error) throw new Error(error.message);
+    out.push(...data.map((r) => normalize(table, r)));
+    if (data.length < PAGE) return out;
+  }
+}
 
 /** Columnes de `settings` que l'app llegeix i escriu. */
 const SETTINGS_KEYS = Object.keys(DEFAULT_SETTINGS) as (keyof Settings)[];
@@ -16,9 +55,12 @@ function pickSettings(row: Record<string, unknown> | null): Settings {
   return out as unknown as Settings;
 }
 
-interface LifeContext {
+export interface LifeContext extends State {
   settings: Settings;
   saveSettings: (patch: Partial<Settings>) => Promise<void>;
+  insert: <K extends LifeTable>(table: K, rows: Partial<LifeTables[K]> | Partial<LifeTables[K]>[]) => Promise<LifeTables[K][]>;
+  update: <K extends LifeTable>(table: K, id: string, patch: Partial<LifeTables[K]>) => Promise<void>;
+  remove: (table: LifeTable, id: string) => Promise<void>;
 }
 
 const Ctx = createContext<LifeContext | null>(null);
@@ -31,16 +73,24 @@ export function useLife(): LifeContext {
 
 /** Dades del panell de vida. Patró de DataProvider (que no es toca) per a les taules noves. */
 export function LifeProvider({ session, children }: { session: Session; children: React.ReactNode }) {
+  const [state, setState] = useState<State>(EMPTY);
   const [settings, setSettings] = useState<Settings>(DEFAULT_SETTINGS);
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
   const [errorMsg, setErrorMsg] = useState("");
 
   const reload = useCallback(async () => {
     try {
-      const { data, error } = await supabase.from("settings").select("*").maybeSingle();
-      if (error) throw new Error(error.message);
+      const since = addDaysISO(todayISO(), -HISTORY_DAYS);
+      const [settingsRes, tasks, events, countdowns] = await Promise.all([
+        supabase.from("settings").select("*").maybeSingle(),
+        fetchAll("tasks", since),
+        fetchAll("events", since),
+        fetchAll("countdowns", since),
+      ]);
+      if (settingsRes.error) throw new Error(settingsRes.error.message);
       // Sense fila (primera sessió): valors per defecte, sense escriure res.
-      setSettings(pickSettings(data));
+      setSettings(pickSettings(settingsRes.data));
+      setState({ tasks, events, countdowns });
       setStatus("ready");
     } catch (e) {
       setErrorMsg(e instanceof Error ? e.message : String(e));
@@ -69,7 +119,31 @@ export function LifeProvider({ session, children }: { session: Session; children
     [settings],
   );
 
-  const value = useMemo<LifeContext>(() => ({ settings, saveSettings }), [settings, saveSettings]);
+  const insert = useCallback<LifeContext["insert"]>(async (table, rows) => {
+    const { data, error } = await supabase.from(table).insert(rows as never).select();
+    if (error) throw new Error(error.message);
+    const added = (data as Record<string, unknown>[]).map((r) => normalize(table, r));
+    setState((s) => ({ ...s, [table]: [...s[table], ...added] }));
+    return added;
+  }, []);
+
+  const update = useCallback<LifeContext["update"]>(async (table, id, patch) => {
+    const { data, error } = await supabase.from(table).update(patch as never).eq("id", id).select().single();
+    if (error) throw new Error(error.message);
+    const row = normalize(table, data as Record<string, unknown>);
+    setState((s) => ({ ...s, [table]: (s[table] as { id: string }[]).map((r) => (r.id === id ? row : r)) }));
+  }, []);
+
+  const remove = useCallback<LifeContext["remove"]>(async (table, id) => {
+    const { error } = await supabase.from(table).delete().eq("id", id);
+    if (error) throw new Error(error.message);
+    setState((s) => ({ ...s, [table]: (s[table] as { id: string }[]).filter((r) => r.id !== id) }));
+  }, []);
+
+  const value = useMemo<LifeContext>(
+    () => ({ ...state, settings, saveSettings, insert, update, remove }),
+    [state, settings, saveSettings, insert, update, remove],
+  );
 
   if (status === "loading") {
     return <div className="grid min-h-dvh place-items-center text-muted">Carregant el teu panell…</div>;

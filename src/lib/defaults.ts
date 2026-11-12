@@ -45,3 +45,8 @@ export const DEFAULT_SETTINGS: Settings = {
   water_goal: 8,
   sleep_goal_minutes: 450,
 };
+
+/** Frases que acompanyen «les 3 d'avui». */
+export const QUOTES: string[] = [
+  "No puges al nivell de les teves metes. Caus al nivell dels teus sistemes.",
+];

@@ -1,7 +1,9 @@
 "use client";
 
+import { DayCard } from "@/components/avui/DayCard";
 import { GreetingHeader } from "@/components/avui/GreetingHeader";
 import { MoneyCard } from "@/components/avui/MoneyCard";
+import { TopThree } from "@/components/avui/TopThree";
 import { WeekFocus } from "@/components/avui/WeekFocus";
 
 export default function AvuiPage() {
@@ -9,7 +11,9 @@ export default function AvuiPage() {
     <>
       <GreetingHeader />
       <WeekFocus />
-      <div className="mt-6 grid gap-4">
+      <div className="mt-6 grid gap-4 lg:grid-cols-2">
+        <DayCard />
+        <TopThree />
         <MoneyCard />
       </div>
     </>

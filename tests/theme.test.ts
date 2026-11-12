@@ -23,6 +23,7 @@ function tokens(body: string): Record<string, string> {
 const light = tokens(block(css, css.indexOf(":root")));
 const darkMedia = block(css, css.indexOf("@media (prefers-color-scheme: dark)"));
 const dark = tokens(block(darkMedia, darkMedia.indexOf(":root")));
+const forcedDark = tokens(block(css, css.indexOf(':root[data-theme="dark"]')));
 
 function luminance(hex: string): number {
   const h = hex.replace("#", "");
@@ -50,5 +51,14 @@ describe("tema", () => {
         expect(contrast(scheme[fg], scheme[bg]), `${name}: ${fg} sobre ${bg}`).toBeGreaterThanOrEqual(4.5);
       }
     }
+  });
+
+  it("el tema triat a mà guanya al del sistema", () => {
+    // El fosc automàtic no s'aplica si l'usuari ha triat clar.
+    expect(css).toContain(':root:not([data-theme="light"])');
+    // El fosc forçat té exactament els mateixos colors que el fosc automàtic.
+    expect(forcedDark).toEqual(dark);
+    expect(css).toMatch(/:root\[data-theme="light"\]\s*\{\s*color-scheme:\s*light/);
+    expect(css).toMatch(/:root\[data-theme="dark"\]\s*\{[^}]*color-scheme:\s*dark/);
   });
 });

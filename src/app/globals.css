@@ -16,8 +16,9 @@
   --done-bg: #e3f1e8;
 }
 
+/* Fosc automàtic (segons el sistema), excepte si s'ha triat «Clar» a Configuració → Perfil. */
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme="light"]) {
     --bg: #14100e;
     --surface: #1c1713;
     --surface-2: #261f19;
@@ -32,6 +33,28 @@
     --done: #5fbf8f;
     --done-bg: #1d3328;
   }
+}
+
+/* Tema triat a mà (data-theme a <html>, posat per l'script de src/lib/theme.ts). Mateixos colors que el fosc automàtic. */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #14100e;
+  --surface: #1c1713;
+  --surface-2: #261f19;
+  --border: #352a21;
+  --text: #f1e9df;
+  --muted: #a39382;
+  --primary: #d97757;
+  --primary-fg: #1a120d;
+  --income: #5fbf8f;
+  --expense: #ff7a6b;
+  --warn: #f0b23e;
+  --done: #5fbf8f;
+  --done-bg: #1d3328;
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
 }
 
 @theme inline {

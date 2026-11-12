@@ -59,6 +59,9 @@ docs/superpowers/specs/  document de disseny amb les decisions i el perquè
 - Hores com a text `HH:MM` (`src/lib/time.ts`); Postgres `time` torna `HH:MM:SS` i el `LifeProvider`
   ho normalitza en carregar.
 - `weekday` = 0–6 amb **0 = dilluns … 6 = diumenge** (`weekdayOf` a `calc/week.ts`), mai el `getDay()` de JS.
+- Tema: `data-theme="light|dark"` a `<html>` (sense atribut = automàtic). L'script en línia de
+  `src/lib/theme.ts` el posa abans de pintar. Els colors foscos són a `globals.css` dues vegades
+  (fosc automàtic i fosc forçat): `tests/theme.test.ts` comprova que coincideixen. Si canvies un, canvia l'altre.
 - Hàbits: amb meta setmanal `n < 7` «toquen» mentre la setmana no arriba a `n`; la ratxa no es
   trenca fins que acaba el dia/setmana en curs. Entreno: «Entrenat» i «Descans» compten com a fet.
 - Objectius: «Vas bé» si el progrés és ≥ fracció de l'any transcorreguda menys una setmana de marge.
@@ -85,6 +88,9 @@ Panell de vida en curs (spec `docs/superpowers/specs/2026-11-12-panell-de-vida-d
 - [x] **Fase 4 · Diari:** `/diari` (ànim 1–5 amb emoji, nota fins a 2000 caràcters, qualsevol dia
       passat, gràfic de 30 dies amb buits on no hi ha entrada, llista d'entrades), targeta «Com estàs
       avui?» a Avui i frase del dia rotativa (12 frases a `QUOTES`).
+
+- [x] **Tema clar/fosc manual** (2026-11-12): Configuració → Perfil → Aparença (Automàtic · Clar · Fosc),
+      desat per dispositiu a `localStorage` (`tema`).
 
 Taules del panell (totes amb RLS «own rows», migracions `20261112*` ja aplicades al Supabase real):
 `settings`, `tasks`, `events`, `countdowns`, `habits`, `habit_logs`, `health_logs`, `goals`, `courses`,
@@ -129,7 +135,7 @@ v1 completa i provada de punta a punta en navegador contra el Supabase real:
       confirmació del registre hi apunti (ara apunta a localhost).
 - [ ] Esborrar l'usuari de proves `e2e-test@example.com` de Supabase (Authentication → Users). No té dades.
 - [ ] Idees: historial del valor de la cartera, dividends, importar Excel, regles de categorització
-      editables, mode fora de línia, selector manual de tema clar/fosc.
+      editables, mode fora de línia.
 
 ## Skills utilitzades
 

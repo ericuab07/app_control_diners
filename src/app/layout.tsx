@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import { themeScript } from "@/lib/theme";
 
 export const metadata: Metadata = {
   title: "Panell de vida",
@@ -20,7 +21,11 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="ca" className="h-full antialiased">
+    <html lang="ca" className="h-full antialiased" suppressHydrationWarning>
+      <head>
+        {/* Aplica el tema triat abans de pintar (vegeu node_modules/next/dist/docs/01-app/02-guides/preventing-flash-before-hydration.md). */}
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+      </head>
       <body className="min-h-full">{children}</body>
     </html>
   );

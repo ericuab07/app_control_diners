@@ -5,7 +5,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 import { addDaysISO, todayISO } from "@/lib/dates";
 import { DEFAULT_SETTINGS } from "@/lib/defaults";
 import { supabase } from "@/lib/supabase";
-import type { Countdown, Course, Goal, Habit, HabitLog, HealthLog, LifeEvent, Settings, StudyItem, StudyLog, Task } from "@/lib/types";
+import type { Countdown, Course, Goal, Habit, HabitLog, HealthLog, JournalEntry, LifeEvent, Settings, StudyItem, StudyLog, Task } from "@/lib/types";
 
 /** Taules del panell de vida que es carreguen en memòria. */
 export interface LifeTables {
@@ -19,16 +19,17 @@ export interface LifeTables {
   courses: Course;
   study_items: StudyItem;
   study_logs: StudyLog;
+  journal_entries: JournalEntry;
 }
 export type LifeTable = keyof LifeTables;
 type State = { [K in LifeTable]: LifeTables[K][] };
 
-const EMPTY: State = { tasks: [], events: [], countdowns: [], habits: [], habit_logs: [], health_logs: [], goals: [], courses: [], study_items: [], study_logs: [] };
+const EMPTY: State = { tasks: [], events: [], countdowns: [], habits: [], habit_logs: [], health_logs: [], goals: [], courses: [], study_items: [], study_logs: [], journal_entries: [] };
 const PAGE = 1000;
 /** Dies d'historial que es carreguen de les taules diàries. */
 const HISTORY_DAYS = 400;
 /** Taules amb columna `date` que només es carreguen des de fa HISTORY_DAYS dies. */
-const DATED: LifeTable[] = ["tasks", "habit_logs", "health_logs", "study_logs"];
+const DATED: LifeTable[] = ["tasks", "habit_logs", "health_logs", "study_logs", "journal_entries"];
 /** Columnes `time` de Postgres ("HH:MM:SS") que es treballen com a "HH:MM". */
 const TIMES: Partial<Record<LifeTable, string[]>> = { events: ["start_time", "end_time"] };
 /** PostgREST retorna `numeric` com a text; aquí es converteix a número. */
@@ -93,7 +94,7 @@ export function LifeProvider({ session, children }: { session: Session; children
   const reload = useCallback(async () => {
     try {
       const since = addDaysISO(todayISO(), -HISTORY_DAYS);
-      const [settingsRes, tasks, events, countdowns, habits, habit_logs, health_logs, goals, courses, study_items, study_logs] = await Promise.all([
+      const [settingsRes, tasks, events, countdowns, habits, habit_logs, health_logs, goals, courses, study_items, study_logs, journal_entries] = await Promise.all([
         supabase.from("settings").select("*").maybeSingle(),
         fetchAll("tasks", since),
         fetchAll("events", since),
@@ -105,11 +106,12 @@ export function LifeProvider({ session, children }: { session: Session; children
         fetchAll("courses", since),
         fetchAll("study_items", since),
         fetchAll("study_logs", since),
+        fetchAll("journal_entries", since),
       ]);
       if (settingsRes.error) throw new Error(settingsRes.error.message);
       // Sense fila (primera sessió): valors per defecte, sense escriure res.
       setSettings(pickSettings(settingsRes.data));
-      setState({ tasks, events, countdowns, habits, habit_logs, health_logs, goals, courses, study_items, study_logs });
+      setState({ tasks, events, countdowns, habits, habit_logs, health_logs, goals, courses, study_items, study_logs, journal_entries });
       setStatus("ready");
     } catch (e) {
       setErrorMsg(e instanceof Error ? e.message : String(e));

@@ -54,6 +54,7 @@ const db = {
   ],
   study_items: [],
   study_logs: [],
+  journal_entries: [],
   accounts: [
     at({ name: "Compte corrent", type: "checking", initial_balance_cents: 125000, color: "#2563eb", archived: false }),
     at({ name: "Estalvis", type: "savings", initial_balance_cents: 340000, color: "#16a34a", archived: false }),
@@ -73,6 +74,11 @@ db.study_items.push(
   at({ course_id: db.courses[1].id, title: "Exercicis tema 4", kind: "entrega", due_date: addDays(-1), done: false }),
 );
 db.study_logs.push(at({ course_id: db.courses[0].id, date: today, minutes: 50 }), at({ course_id: db.courses[1].id, date: today, minutes: 25 }));
+const notes = ["Dia tranquil, he avançat la pràctica.", "", "Cansat però content.", "Molta feina a la uni.", "Sopar amb amics!", ""];
+for (let i = 1; i <= 24; i++) {
+  if (i % 5 === 0) continue; // alguns dies sense entrada
+  db.journal_entries.push(at({ date: addDays(-i), mood: [3, 4, 4, 5, 2, 3, 4][i % 7], note: notes[i % notes.length], updated_at: new Date().toISOString() }));
+}
 db.transactions.push(
   at({ account_id: db.accounts[0].id, kind: "income", amount_cents: 90000, date: addDays(-8), description: "Nòmina", category_id: null, transfer_account_id: null, recurring_rule_id: null }),
   at({ account_id: db.accounts[0].id, kind: "expense", amount_cents: 4320, date: addDays(-2), description: "Supermercat", category_id: null, transfer_account_id: null, recurring_rule_id: null }),

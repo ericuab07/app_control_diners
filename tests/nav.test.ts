@@ -9,6 +9,8 @@ describe("nav", () => {
     expect(sectionOf("/diners-extra")).toBeNull();
     expect(sectionOf("/habits")).toBe("habits");
     expect(sectionOf("/habits-x")).toBeNull();
+    expect(sectionOf("/objectius")).toBe("objectius");
+    expect(sectionOf("/estudis/x")).toBe("estudis");
   });
   it("isDinersPath", () => {
     expect(isDinersPath("/accions")).toBe(true);

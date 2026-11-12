@@ -1,6 +1,6 @@
 "use client";
 
-import { Ellipsis, Flame, Plus, Settings, Sun, Wallet } from "lucide-react";
+import { Ellipsis, Flame, GraduationCap, Plus, Settings, Sun, Target, Wallet } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
@@ -15,7 +15,9 @@ type NavItem = { section: Section; href: string; label: string; icon: typeof Sun
 const NAV: NavItem[] = [
   { section: "avui", href: "/", label: "Avui", icon: Sun, mobile: "bar" },
   { section: "habits", href: "/habits", label: "Hàbits", icon: Flame, mobile: "bar" },
-  { section: "diners", href: "/diners", label: "Diners", icon: Wallet, mobile: "bar" },
+  { section: "objectius", href: "/objectius", label: "Objectius", icon: Target, mobile: "bar" },
+  { section: "estudis", href: "/estudis", label: "Estudis", icon: GraduationCap, mobile: "more" },
+  { section: "diners", href: "/diners", label: "Diners", icon: Wallet, mobile: "more" },
   { section: "configuracio", href: "/configuracio", label: "Configuració", icon: Settings, mobile: "more" },
 ];
 const BAR = NAV.filter((n) => n.mobile === "bar");

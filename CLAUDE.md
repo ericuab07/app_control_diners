@@ -12,7 +12,13 @@ npm run dev      # servidor local a http://localhost:3000
 npm test         # tests unitaris (vitest) de src/lib
 npm run lint     # eslint
 npm run build    # compilació de producció (inclou comprovació de tipus)
+node scripts/mock-supabase.mjs   # Supabase simulat (port 54399) per veure l'app sense login
 ```
+
+**Veure l'app amb dades simulades:** `node scripts/mock-supabase.mjs` i, en un altre terminal,
+`NEXT_PUBLIC_SUPABASE_URL=http://localhost:54399 npx next dev -p 3100` (a Windows `cmd`:
+`set NEXT_PUBLIC_SUPABASE_URL=http://localhost:54399&& npx next dev -p 3100`). Obre
+http://localhost:3100, executa a la consola el `seed` de http://localhost:54399/session i recarrega.
 
 ## Arquitectura
 
@@ -27,7 +33,7 @@ npm run build    # compilació de producció (inclou comprovació de tipus)
 
 ```
 src/lib/calc/        lògica pura i testada: balances, budgets, stats, recurring, portfolio, csv,
-                     week (setmana, focus)
+                     week (setmana, focus), agenda, dayProgress, countdowns, tasks
 src/lib/             types, money (cèntims), dates (ISO YYYY-MM-DD), time (HH:MM), nav, defaults, supabase
 src/components/      DataProvider, LifeProvider, AppShell (navegació), DinersTabs, TransactionForm/List,
                      ui, settings/* (Perfil inclòs), avui/* (targetes de la portada)
@@ -46,6 +52,12 @@ docs/superpowers/specs/  document de disseny amb les decisions i el perquè
 - La lògica de càlcul nova va a `src/lib/calc/` amb el seu test a `tests/`.
 - Text de la interfície en català. Colors via variables CSS de `globals.css` (clar i fosc automàtic).
 - Canvis d'esquema: fitxer nou a `supabase/migrations/` i aplicar-lo amb el connector de Supabase.
+  Una migració per fase del panell; només taules noves; després `get_advisors` (security).
+- Hores com a text `HH:MM` (`src/lib/time.ts`); Postgres `time` torna `HH:MM:SS` i el `LifeProvider`
+  ho normalitza en carregar.
+- `weekday` = 0–6 amb **0 = dilluns … 6 = diumenge** (`weekdayOf` a `calc/week.ts`), mai el `getDay()` de JS.
+- Taula nova del panell: afegir-la a `LifeTables`, `EMPTY` i `reload` del `LifeProvider`
+  (i a `DATED` si és diària), i al `db` de `scripts/mock-supabase.mjs`.
 
 ## Estat (2026-11-12)
 
@@ -54,6 +66,10 @@ Panell de vida en curs (spec `docs/superpowers/specs/2026-11-12-panell-de-vida-d
 - [x] **Fase 0 · Base:** pell editorial (fosc càlid, terracota, serif), navegació Avui/Diners, balanç a
       `/diners`, taula `settings` + `LifeProvider`, portada amb salutació, focus de la setmana, targeta de
       diners i pestanya «Perfil» (nom i metes).
+- [x] **Fase 1 · El dia:** les 3 d'avui (amb frase), cercle «El teu dia», agenda amb línia «ara» i
+      «En X min» (puntuals i setmanals), comptes enrere, «+» contextual (Diners → moviment; resta →
+      prioritat o esdeveniment). Provat amb dades simulades a 1280 px fosc i 375 px clar.
+- [ ] Fase 2 · Hàbits i salut · [ ] Fase 3 · Objectius i Estudis UAB · [ ] Fase 4 · Diari
 
 ### v1 de diners (2026-11-10)
 
@@ -72,9 +88,13 @@ v1 completa i provada de punta a punta en navegador contra el Supabase real:
 
 ## Pendent
 
-- [ ] **Prova a mà del panell** (no hi ha contrasenya de l'usuari de proves a la sessió de Claude):
-      iniciar sessió, desar el focus i el perfil, veure la targeta de diners, i navegar per les pestanyes de
-      Diners (incloent mòbil i fosc).
+- [ ] **Prova a mà contra el Supabase real** (Claude no té la contrasenya de l'usuari de proves; s'ha
+      provat amb `scripts/mock-supabase.mjs`): iniciar sessió, desar focus i perfil, afegir 3 prioritats i
+      intentar la 4a, esdeveniment setmanal, compte enrere, targeta de diners i pestanyes de Diners.
+- [ ] En `next dev` surten avisos «Could not validate that a segment … has instant navigation» a totes
+      les rutes (també les de la v1): l'app es renderitza tota al client darrere la sessió. Només surt en
+      desenvolupament; es podria silenciar amb `export const instant = false` si molesta.
+- [ ] Decisió presa: l'spec deia «Empeça per una»; s'ha posat «Comença per una» (errada ortogràfica).
 - [ ] Supabase avisa «Leaked password protection disabled» (Auth → Providers → Email). Activar-ho és
       opcional; no s'ha tocat perquè és configuració d'Auth.
 

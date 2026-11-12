@@ -189,3 +189,13 @@ export interface StudyLog {
   date: string;
   minutes: number;
 }
+
+export type Mood = 1 | 2 | 3 | 4 | 5;
+
+/** Una entrada de diari per dia. */
+export interface JournalEntry {
+  id: string;
+  date: string;
+  mood: Mood;
+  note: string;
+}

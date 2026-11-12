@@ -49,4 +49,15 @@ export const DEFAULT_SETTINGS: Settings = {
 /** Frases que acompanyen «les 3 d'avui». */
 export const QUOTES: string[] = [
   "No puges al nivell de les teves metes. Caus al nivell dels teus sistemes.",
+  "Fes avui la versió petita. Demà ja la faràs gran.",
+  "Una cosa feta val més que deu de pensades.",
+  "El que mesures, millora. El que apuntes, ho recordes.",
+  "No cal que tingues ganes: només cal que comencis cinc minuts.",
+  "Descansar també és part del pla.",
+  "Les ratxes no es fan amb dies perfectes, sinó amb dies que no falles.",
+  "Primer el més important; la resta, si hi ha temps.",
+  "Si una cosa et fa por, divideix-la fins que deixi de fer-ne.",
+  "Avui no ha de ser un gran dia. Ha de ser un dia bo.",
+  "El progrés lent continua sent progrés.",
+  "Tanca el dia apuntant una cosa que ha anat bé.",
 ];

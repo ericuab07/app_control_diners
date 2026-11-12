@@ -16,6 +16,12 @@ export function fromISO(iso: string): Date {
   return new Date(y, m - 1, d);
 }
 
+export function addDaysISO(iso: string, n: number): string {
+  const d = fromISO(iso);
+  d.setDate(d.getDate() + n);
+  return toISO(d);
+}
+
 /** "YYYY-MM" d'una data ISO */
 export function monthKey(iso: string): string {
   return iso.slice(0, 7);
@@ -53,6 +59,14 @@ export function formatMonth(key: string): string {
 
 export function formatMonthShort(key: string): string {
   return `${monthShort.format(fromISO(`${key}-01`)).replace(".", "")} ${key.slice(2, 4)}`;
+}
+
+const longFmt = new Intl.DateTimeFormat("ca-ES", { weekday: "long", day: "numeric", month: "long" });
+
+/** «Dimarts, 27 d'octubre» */
+export function formatLongDate(iso: string): string {
+  const s = longFmt.format(fromISO(iso));
+  return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
 export function formatDate(iso: string): string {

@@ -22,7 +22,7 @@ export function CountdownsCard() {
   );
 
   return (
-    <Card>
+    <Card className="h-full">
       <div className="mb-3 flex items-center justify-between gap-2">
         <h2 className="font-serif text-xl font-semibold">Comptes enrere</h2>
         {upcoming.length > 0 && (

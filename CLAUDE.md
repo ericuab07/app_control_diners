@@ -33,11 +33,14 @@ http://localhost:3100, executa a la consola el `seed` de http://localhost:54399/
 
 ```
 src/lib/calc/        lògica pura i testada: balances, budgets, stats, recurring, portfolio, csv,
-                     week (setmana, focus), agenda, dayProgress, countdowns, tasks, habits, health
+                     week (setmana, focus), agenda, dayProgress, countdowns, tasks, habits, health,
+                     goals, study
 src/lib/             types, money (cèntims), dates (ISO YYYY-MM-DD), time (HH:MM), nav, defaults, supabase
 src/components/      DataProvider, LifeProvider, AppShell (navegació), DinersTabs, TransactionForm/List,
-                     ui, settings/* (Perfil inclòs), avui/* (targetes de la portada), habits/*
-src/app/(app)/       pàgines amb sessió: / (Avui), habits, diners (balanç), ingressos, despeses, accions,
+                     ui, settings/* (Perfil inclòs), avui/* (targetes de la portada), habits/*,
+                     goals/*, study/*, QuickAdd («+» fora de Diners)
+src/app/(app)/       pàgines amb sessió: / (Avui), habits, objectius, estudis, diners (balanç), ingressos,
+                     despeses, accions,
                      pressupostos, estadistiques, configuracio
 src/app/login/       inici de sessió i registre
 supabase/migrations/ esquema SQL (ja aplicat al projecte)
@@ -58,6 +61,7 @@ docs/superpowers/specs/  document de disseny amb les decisions i el perquè
 - `weekday` = 0–6 amb **0 = dilluns … 6 = diumenge** (`weekdayOf` a `calc/week.ts`), mai el `getDay()` de JS.
 - Hàbits: amb meta setmanal `n < 7` «toquen» mentre la setmana no arriba a `n`; la ratxa no es
   trenca fins que acaba el dia/setmana en curs. Entreno: «Entrenat» i «Descans» compten com a fet.
+- Objectius: «Vas bé» si el progrés és ≥ fracció de l'any transcorreguda menys una setmana de marge.
 - Files d'una per dia (`health_logs`): sempre `upsert(..., "user_id,date")` del `LifeProvider`.
 - Taula nova del panell: afegir-la a `LifeTables`, `EMPTY` i `reload` del `LifeProvider`
   (i a `DATED` si és diària), i al `db` de `scripts/mock-supabase.mjs`.
@@ -75,7 +79,10 @@ Panell de vida en curs (spec `docs/superpowers/specs/2026-11-12-panell-de-vida-d
 - [x] **Fase 2 · Hàbits i salut:** `/habits` (diaris o N cops/setmana, ratxes en dies o setmanes,
       últims 7 dies per marcar, arxivar), «Hàbits d'avui» i «El teu dia en números» (gotes d'aigua,
       passos, son, entrenat/descans). El cercle suma tasques + hàbits que toquen + 4 metes de salut.
-- [ ] Fase 3 · Objectius i Estudis UAB · [ ] Fase 4 · Diari
+- [x] **Fase 3 · Llarg termini:** `/objectius` (barra amb marca del ritme esperat, ±1 ràpid, per anys),
+      `/estudis` (assignatures, entregues/exàmens amb vençuts en vermell, minuts per setmana), targetes
+      «Objectius» i «Properes entregues» a Avui. Navegació final: mòbil Avui · Hàbits · + · Objectius · Més.
+- [ ] Fase 4 · Diari
 
 ### v1 de diners (2026-11-10)
 

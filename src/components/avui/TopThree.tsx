@@ -25,7 +25,7 @@ export function TopThree() {
   const del = (t: Task) => confirm(`Vols esborrar «${t.title}»?`) && void run(() => remove("tasks", t.id));
 
   return (
-    <Card>
+    <Card className="h-full">
       <h2 className="mb-3 font-serif text-xl font-semibold">Les 3 d&apos;avui</h2>
       <ol className="space-y-2">
         {([1, 2, 3] as const).map((rank) => {

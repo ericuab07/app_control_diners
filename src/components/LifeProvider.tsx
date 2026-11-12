@@ -5,7 +5,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 import { addDaysISO, todayISO } from "@/lib/dates";
 import { DEFAULT_SETTINGS } from "@/lib/defaults";
 import { supabase } from "@/lib/supabase";
-import type { Countdown, Habit, HabitLog, HealthLog, LifeEvent, Settings, Task } from "@/lib/types";
+import type { Countdown, Course, Goal, Habit, HabitLog, HealthLog, LifeEvent, Settings, StudyItem, StudyLog, Task } from "@/lib/types";
 
 /** Taules del panell de vida que es carreguen en memòria. */
 export interface LifeTables {
@@ -15,21 +15,28 @@ export interface LifeTables {
   habits: Habit;
   habit_logs: HabitLog;
   health_logs: HealthLog;
+  goals: Goal;
+  courses: Course;
+  study_items: StudyItem;
+  study_logs: StudyLog;
 }
 export type LifeTable = keyof LifeTables;
 type State = { [K in LifeTable]: LifeTables[K][] };
 
-const EMPTY: State = { tasks: [], events: [], countdowns: [], habits: [], habit_logs: [], health_logs: [] };
+const EMPTY: State = { tasks: [], events: [], countdowns: [], habits: [], habit_logs: [], health_logs: [], goals: [], courses: [], study_items: [], study_logs: [] };
 const PAGE = 1000;
 /** Dies d'historial que es carreguen de les taules diàries. */
 const HISTORY_DAYS = 400;
 /** Taules amb columna `date` que només es carreguen des de fa HISTORY_DAYS dies. */
-const DATED: LifeTable[] = ["tasks", "habit_logs", "health_logs"];
+const DATED: LifeTable[] = ["tasks", "habit_logs", "health_logs", "study_logs"];
 /** Columnes `time` de Postgres ("HH:MM:SS") que es treballen com a "HH:MM". */
 const TIMES: Partial<Record<LifeTable, string[]>> = { events: ["start_time", "end_time"] };
+/** PostgREST retorna `numeric` com a text; aquí es converteix a número. */
+const NUMERIC: Partial<Record<LifeTable, string[]>> = { goals: ["target_value", "current_value"] };
 
 function normalize<K extends LifeTable>(table: K, row: Record<string, unknown>): LifeTables[K] {
   for (const col of TIMES[table] ?? []) if (typeof row[col] === "string") row[col] = (row[col] as string).slice(0, 5);
+  for (const col of NUMERIC[table] ?? []) row[col] = Number(row[col]);
   return row as unknown as LifeTables[K];
 }
 
@@ -86,7 +93,7 @@ export function LifeProvider({ session, children }: { session: Session; children
   const reload = useCallback(async () => {
     try {
       const since = addDaysISO(todayISO(), -HISTORY_DAYS);
-      const [settingsRes, tasks, events, countdowns, habits, habit_logs, health_logs] = await Promise.all([
+      const [settingsRes, tasks, events, countdowns, habits, habit_logs, health_logs, goals, courses, study_items, study_logs] = await Promise.all([
         supabase.from("settings").select("*").maybeSingle(),
         fetchAll("tasks", since),
         fetchAll("events", since),
@@ -94,11 +101,15 @@ export function LifeProvider({ session, children }: { session: Session; children
         fetchAll("habits", since),
         fetchAll("habit_logs", since),
         fetchAll("health_logs", since),
+        fetchAll("goals", since),
+        fetchAll("courses", since),
+        fetchAll("study_items", since),
+        fetchAll("study_logs", since),
       ]);
       if (settingsRes.error) throw new Error(settingsRes.error.message);
       // Sense fila (primera sessió): valors per defecte, sense escriure res.
       setSettings(pickSettings(settingsRes.data));
-      setState({ tasks, events, countdowns, habits, habit_logs, health_logs });
+      setState({ tasks, events, countdowns, habits, habit_logs, health_logs, goals, courses, study_items, study_logs });
       setStatus("ready");
     } catch (e) {
       setErrorMsg(e instanceof Error ? e.message : String(e));
@@ -147,8 +158,12 @@ export function LifeProvider({ session, children }: { session: Session; children
     if (error) throw new Error(error.message);
     setState((s) => {
       const next = { ...s, [table]: (s[table] as { id: string }[]).filter((r) => r.id !== id) };
-      // Esborrar un hàbit esborra els seus registres a la BD (cascade): també a l'estat.
+      // Esborrar un hàbit o una assignatura esborra els seus fills a la BD (cascade): també a l'estat.
       if (table === "habits") next.habit_logs = s.habit_logs.filter((l) => l.habit_id !== id);
+      if (table === "courses") {
+        next.study_items = s.study_items.filter((i) => i.course_id !== id);
+        next.study_logs = s.study_logs.filter((l) => l.course_id !== id);
+      }
       return next;
     });
   }, []);

@@ -5,6 +5,13 @@ Panell de vida personal (un usuari) en català: portada «Avui» amb el dia i la
 
 @AGENTS.md
 
+## Producció
+
+- **URL:** https://panell-de-vida-phi.vercel.app (projecte Vercel `panell-de-vida`, equip «ericus»).
+- Cada `git push` a **`main`** es publica sol a producció; les altres branques generen previsualitzacions.
+- Variables a Vercel: `NEXT_PUBLIC_SUPABASE_URL` i `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (les mateixes que `.env`).
+- Al mòbil: obre la URL i fes «Afegeix a la pantalla d'inici» (és una PWA).
+
 ## Ordres
 
 ```bash
@@ -133,9 +140,9 @@ v1 completa i provada de punta a punta en navegador contra el Supabase real:
 - [ ] Supabase avisa «Leaked password protection disabled» (Auth → Providers → Email). Activar-ho és
       opcional; no s'ha tocat perquè és configuració d'Auth.
 
-- [ ] **Desplegar a Vercel** (encara no està publicada). Després, a Supabase → Authentication → URL
-      Configuration, posar la URL de producció com a «Site URL» perquè l'enllaç del correu de
-      confirmació del registre hi apunti (ara apunta a localhost).
+- [ ] A Supabase → Authentication → URL Configuration, posar **Site URL** =
+      `https://panell-de-vida-phi.vercel.app` (i afegir-la a «Redirect URLs») perquè els correus d'Auth
+      (confirmació del registre, canvi de contrasenya) hi apuntin. L'inici de sessió amb contrasenya ja funciona sense això.
 - [ ] Esborrar l'usuari de proves `e2e-test@example.com` de Supabase (Authentication → Users). No té dades.
 - [ ] Idees: historial del valor de la cartera, dividends, importar Excel, regles de categorització
       editables, mode fora de línia.

@@ -45,12 +45,12 @@ http://localhost:3100, executa a la consola el `seed` de http://localhost:54399/
 
 ```
 src/lib/calc/        lògica pura i testada: balances, budgets, stats, recurring, portfolio, csv,
-                     week (setmana, focus), agenda, dayProgress, countdowns, tasks, habits, health,
+                     week (setmana, focus), closeDay (passar pendents), agenda, dayProgress, countdowns, tasks, habits, health,
                      goals, study, journal
 src/lib/             types, money (cèntims), dates (ISO YYYY-MM-DD), time (HH:MM), nav, defaults, supabase
 src/components/      DataProvider, LifeProvider, AppShell (navegació), DinersTabs, TransactionForm/List,
                      ui, settings/* (Perfil inclòs), avui/* (targetes de la portada), habits/*,
-                     goals/*, study/*, journal/*, QuickAdd («+» fora de Diners)
+                     goals/*, study/*, journal/*, inbox/*, QuickAdd («+» fora de Diners)
 src/app/(app)/       pàgines amb sessió: / (Avui), habits, objectius, estudis, diari, diners (balanç), ingressos,
                      despeses, accions,
                      pressupostos, estadistiques, configuracio
@@ -107,9 +107,17 @@ Panell de vida en curs (spec `docs/superpowers/specs/2026-11-12-panell-de-vida-d
 - [x] **Tema clar/fosc manual** (2026-11-12): Configuració → Perfil → Aparença (Automàtic · Clar · Fosc),
       desat per dispositiu a `localStorage` (`tema`).
 
+- [x] **Tancar el dia i apunts ràpids** (2026-11-12):
+  - «Tanca el dia» (targeta a partir de les 20:00, i enllaç a «El teu dia» a qualsevol hora): repàs, passar
+    pendents a demà o descartar-les, ànim i nota al diari, i les 3 de demà.
+  - Al matí, si ahir van quedar prioritats sense fer, avís per passar-les a avui (o «Deixa-ho»).
+  - Si el dia de destí ja té les 3 prioritats, les que sobren van a la safata «Apunts».
+  - «Apunts»: captura ràpida (targeta a Avui i «+» → Apunt ràpid) i classificar cada apunt com a prioritat
+    d'avui o demà, esdeveniment o entrega (taula `inbox_items`).
+
 Taules del panell (totes amb RLS «own rows», migracions `20261112*` ja aplicades al Supabase real):
 `settings`, `tasks`, `events`, `countdowns`, `habits`, `habit_logs`, `health_logs`, `goals`, `courses`,
-`study_items`, `study_logs`, `journal_entries`. Plans de cada fase a `docs/superpowers/plans/`.
+`study_items`, `study_logs`, `journal_entries`, `inbox_items`. Plans de cada fase a `docs/superpowers/plans/`.
 
 ### v1 de diners (2026-11-10)
 

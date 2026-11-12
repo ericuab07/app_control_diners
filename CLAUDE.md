@@ -11,6 +11,9 @@ Panell de vida personal (un usuari) en català: portada «Avui» amb el dia i la
 - Cada `git push` a **`main`** es publica sol a producció; les altres branques generen previsualitzacions.
 - Variables a Vercel: `NEXT_PUBLIC_SUPABASE_URL` i `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (les mateixes que `.env`).
 - Al mòbil: obre la URL i fes «Afegeix a la pantalla d'inici» (és una PWA).
+- Logo: llibreta fosca amb punt de llibre terracota (`docs/logo/logo.svg` és l'original; `public/` té
+  `icon.svg`, `icon-192/512.png`, `icon-maskable-512.png` amb marge per a Android i `apple-touch-icon.png`).
+  Si canvia el logo, cal treure l'app de la pantalla d'inici i tornar-la a afegir per veure la icona nova.
 - Supabase Auth → URL Configuration: Site URL = la URL de producció; Redirect URLs =
   `https://panell-de-vida-phi.vercel.app/**` i `http://localhost:3000/**` (configurat el 2026-11-12).
 

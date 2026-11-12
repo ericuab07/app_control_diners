@@ -6,7 +6,10 @@ export const metadata: Metadata = {
   title: "Panell de vida",
   description: "El teu dia i la teva vida en una pantalla: agenda, prioritats, hàbits, objectius i diners.",
   appleWebApp: { capable: true, title: "Panell", statusBarStyle: "default" },
-  icons: { icon: "/icon-192.png", apple: "/icon-192.png" },
+  icons: {
+    icon: [{ url: "/icon.svg", type: "image/svg+xml" }, { url: "/icon-192.png", sizes: "192x192", type: "image/png" }],
+    apple: "/apple-touch-icon.png",
+  },
 };
 
 export const viewport: Viewport = {

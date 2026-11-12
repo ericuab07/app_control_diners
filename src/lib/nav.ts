@@ -1,0 +1,17 @@
+export type Section = "avui" | "diners" | "configuracio";
+
+/** Rutes que formen el mòdul «Diners» (les URL no canvien; només el balanç es va moure a /diners). */
+export const DINERS_PATHS: readonly string[] = ["/diners", "/ingressos", "/despeses", "/accions", "/pressupostos", "/estadistiques"];
+
+const matches = (pathname: string, base: string) => pathname === base || pathname.startsWith(`${base}/`);
+
+export function isDinersPath(pathname: string): boolean {
+  return DINERS_PATHS.some((p) => matches(pathname, p));
+}
+
+export function sectionOf(pathname: string): Section | null {
+  if (pathname === "/") return "avui";
+  if (isDinersPath(pathname)) return "diners";
+  if (matches(pathname, "/configuracio")) return "configuracio";
+  return null;
+}

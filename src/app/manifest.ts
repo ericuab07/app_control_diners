@@ -2,9 +2,9 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Control de diners",
-    short_name: "Diners",
-    description: "Finances personals: balanç, ingressos, despeses, accions i pressupostos.",
+    name: "Panell de vida",
+    short_name: "Panell",
+    description: "El teu dia i la teva vida en una pantalla: agenda, prioritats, hàbits, objectius i diners.",
     start_url: "/",
     display: "standalone",
     background_color: "#14100e",

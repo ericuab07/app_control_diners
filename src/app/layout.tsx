@@ -2,9 +2,9 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Control de diners",
-  description: "Finances personals: balanç, ingressos, despeses, accions i pressupostos.",
-  appleWebApp: { capable: true, title: "Diners", statusBarStyle: "default" },
+  title: "Panell de vida",
+  description: "El teu dia i la teva vida en una pantalla: agenda, prioritats, hàbits, objectius i diners.",
+  appleWebApp: { capable: true, title: "Panell", statusBarStyle: "default" },
   icons: { icon: "/icon-192.png", apple: "/icon-192.png" },
 };
 

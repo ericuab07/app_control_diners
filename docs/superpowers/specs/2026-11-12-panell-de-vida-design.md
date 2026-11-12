@@ -1,6 +1,6 @@
 # Panell de vida — disseny
 
-Data: 2026-11-12 · Estat: pendent de revisió
+Data: 2026-11-12 · Estat: aprovat
 
 ## Objectiu
 

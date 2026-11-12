@@ -1,16 +1,18 @@
 "use client";
 
-import { CalendarPlus, ListChecks } from "lucide-react";
+import { CalendarPlus, Flame, ListChecks } from "lucide-react";
 import { useState } from "react";
 import { EventForm } from "./avui/EventForm";
 import { TaskForm } from "./avui/TaskForm";
+import { HabitForm } from "./habits/HabitForm";
 import { Modal } from "./ui";
 
-type Choice = "task" | "event";
+type Choice = "task" | "event" | "habit";
 
 const OPTIONS: { id: Choice; label: string; hint: string; icon: typeof ListChecks }[] = [
   { id: "task", label: "Nova prioritat d'avui", hint: "Una de les 3 coses que vols fer avui", icon: ListChecks },
   { id: "event", label: "Nou esdeveniment", hint: "Classe, feina o pla a l'agenda", icon: CalendarPlus },
+  { id: "habit", label: "Nou hàbit", hint: "Una cosa petita per repetir cada setmana", icon: Flame },
 ];
 
 /** Botó «+» fora de Diners: tria què vols afegir. */
@@ -18,6 +20,7 @@ export function QuickAdd({ onClose }: { onClose: () => void }) {
   const [choice, setChoice] = useState<Choice | null>(null);
   if (choice === "task") return <TaskForm onClose={onClose} />;
   if (choice === "event") return <EventForm onClose={onClose} />;
+  if (choice === "habit") return <HabitForm onClose={onClose} />;
   return (
     <Modal title="Afegir" onClose={onClose}>
       <ul className="space-y-2">

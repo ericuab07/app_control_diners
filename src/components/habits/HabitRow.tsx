@@ -45,7 +45,7 @@ export function HabitRow({ habit, today, onEdit }: { habit: Habit; today: string
           const label = dayLong.format(fromISO(d));
           return (
             <li key={d} className="flex flex-col items-center gap-1">
-              <span className={cx("text-xs", d === today ? "font-semibold text-primary" : "text-muted")}>{dayLetter.format(fromISO(d)).toUpperCase()}</span>
+              <span className={cx("text-xs", d === today ? "font-semibold text-primary" : "text-muted")}>{dayLetter.format(fromISO(d)).replace(".", "")}</span>
               <button onClick={() => toggle(habit, d)} disabled={busy} role="checkbox" aria-checked={on} aria-label={`${habit.name}, ${label}`}
                 className={cx("grid size-9 place-items-center rounded-full border-2", on ? "border-done bg-done text-surface" : "border-border hover:border-primary")}>
                 {on && <Check size={16} strokeWidth={3} />}

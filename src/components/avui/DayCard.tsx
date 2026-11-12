@@ -2,16 +2,29 @@
 
 import { useMemo } from "react";
 import { dayProgress } from "@/lib/calc/dayProgress";
+import { doneDates, isDueOn } from "@/lib/calc/habits";
+import { healthItems } from "@/lib/calc/health";
 import { useLife } from "../LifeProvider";
 import { Card } from "../ui";
 import { ProgressRing } from "./ProgressRing";
 import { useNow } from "./useNow";
 
-/** «El teu dia»: cercle de progrés amb les tasques d'avui (les fases següents hi sumaran hàbits i salut). */
+/** «El teu dia»: tasques d'avui + hàbits que toquen avui + les 4 metes de salut. */
 export function DayCard() {
-  const { tasks } = useLife();
+  const { tasks, habits, habit_logs, health_logs, settings } = useLife();
   const { today } = useNow();
-  const progress = useMemo(() => dayProgress(tasks.filter((t) => t.date === today)), [tasks, today]);
+  const progress = useMemo(() => {
+    const habitItems = habits
+      .filter((h) => !h.archived)
+      .map((h) => ({ habit: h, done: doneDates(habit_logs, h.id) }))
+      .filter(({ habit, done }) => isDueOn(habit, done, today))
+      .map(({ done }) => ({ done: done.has(today) }));
+    return dayProgress([
+      ...tasks.filter((t) => t.date === today),
+      ...habitItems,
+      ...healthItems(health_logs.find((l) => l.date === today), settings),
+    ]);
+  }, [tasks, habits, habit_logs, health_logs, settings, today]);
   return (
     <Card className="flex h-full items-center gap-5">
       <ProgressRing ratio={progress.ratio} caption={progress.label} size={112} />

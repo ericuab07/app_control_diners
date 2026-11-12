@@ -92,3 +92,17 @@ export interface Settings {
   water_goal: number;
   sleep_goal_minutes: number;
 }
+
+export type EventKind = "class" | "work" | "personal" | "other";
+
+/** Esdeveniment de l'agenda: puntual (`date`) o setmanal (`weekday` 0 = dilluns, fins a `repeat_until`). */
+export interface LifeEvent {
+  id: string;
+  title: string;
+  start_time: string;
+  end_time: string;
+  kind: EventKind;
+  date: string | null;
+  weekday: number | null;
+  repeat_until: string | null;
+}

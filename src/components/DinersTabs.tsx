@@ -8,6 +8,7 @@ export const DINERS_TABS = [
   { href: "/diners", label: "Balanç" },
   { href: "/ingressos", label: "Ingressos" },
   { href: "/despeses", label: "Despeses" },
+  { href: "/super", label: "Súper" },
   { href: "/accions", label: "Accions" },
   { href: "/pressupostos", label: "Pressupostos" },
   { href: "/estadistiques", label: "Estadístiques" },

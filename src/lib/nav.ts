@@ -4,7 +4,7 @@ export type Section = "avui" | "diners" | "habits" | "objectius" | "estudis" | "
 const SIMPLE: Section[] = ["habits", "objectius", "estudis", "diari", "configuracio"];
 
 /** Rutes que formen el mòdul «Diners» (les URL no canvien; només el balanç es va moure a /diners). */
-export const DINERS_PATHS: readonly string[] = ["/diners", "/ingressos", "/despeses", "/accions", "/pressupostos", "/estadistiques"];
+export const DINERS_PATHS: readonly string[] = ["/diners", "/ingressos", "/despeses", "/accions", "/super", "/pressupostos", "/estadistiques"];
 
 const matches = (pathname: string, base: string) => pathname === base || pathname.startsWith(`${base}/`);
 

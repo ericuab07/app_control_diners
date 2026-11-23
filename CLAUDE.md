@@ -46,12 +46,12 @@ http://localhost:3100, executa a la consola el `seed` de http://localhost:54399/
 ```
 src/lib/calc/        lògica pura i testada: balances, budgets, stats, recurring, portfolio, csv,
                      week (setmana, focus), closeDay (passar pendents), agenda, dayProgress, countdowns, tasks, habits, health,
-                     goals, study, journal
+                     goals, study, journal, shopping (cistella del súper)
 src/lib/             types, money (cèntims), dates (ISO YYYY-MM-DD), time (HH:MM), nav, defaults, supabase
 src/components/      DataProvider, LifeProvider, AppShell (navegació), DinersTabs, TransactionForm/List,
                      ui, settings/* (Perfil inclòs), avui/* (targetes de la portada), habits/*,
                      goals/*, study/*, journal/*, inbox/*, QuickAdd («+» fora de Diners)
-src/app/(app)/       pàgines amb sessió: / (Avui), habits, objectius, estudis, diari, diners (balanç), ingressos,
+src/app/(app)/       pàgines amb sessió: / (Avui), habits, objectius, estudis, diari, diners (balanç), ingressos, super,
                      despeses, accions,
                      pressupostos, estadistiques, configuracio
 src/app/login/       inici de sessió i registre
@@ -84,6 +84,24 @@ docs/superpowers/specs/  document de disseny amb les decisions i el perquè
 - Taula nova del panell: afegir-la a `LifeTables`, `EMPTY` i `reload` del `LifeProvider`
   (i a `DATED` si és diària), i al `db` de `scripts/mock-supabase.mjs`.
 
+## Tiquets del súper (ho fa Claude, sense API)
+
+L'usuari envia la foto d'un tiquet al xat i Claude n'afegeix els productes al catàleg amb el connector de
+Supabase (`execute_sql`), sense cap API de pagament dins l'app. Usuari real: `4b711257-6384-4700-a597-88ed3c4edb39`.
+
+1. Llegeix el tiquet i fes una taula (nom curt i clar en català, preu en cèntims, si és a pes). Als productes a
+   pes (línies amb kg o €/kg) el preu és l'import pagat i `by_weight = true`. Ignora descomptes, bosses i totals;
+   si un descompte és d'un producte concret, resta'l del seu preu. Ensenya la taula a l'usuari abans de desar.
+2. Mira primer els noms que ja hi ha (`select name from products where user_id = …`) i reaprofita'ls perquè no
+   hi hagi duplicats amb un altre nom («Llet sencera» vs «Llet»).
+3. Desa amb upsert (actualitza el preu si ja existia):
+   `insert into public.products (user_id, name, price_cents, by_weight, price_date) values (…)
+    on conflict (user_id, name) do update set price_cents = excluded.price_cents, by_weight = excluded.by_weight,
+    price_date = excluded.price_date, archived = false;`
+4. Només si l'usuari ho demana, registra també el tiquet com a compra: una fila a `transactions` (expense, total,
+   data del tiquet, categoria «Supermercat» de l'usuari, compte que digui) i les seves línies a `purchase_items`.
+   L'app carrega les dades en iniciar sessió: cal recarregar-la per veure els canvis.
+
 ## Estat (2026-11-12)
 
 Panell de vida en curs (spec `docs/superpowers/specs/2026-11-12-panell-de-vida-design.md`):
@@ -99,7 +117,7 @@ Panell de vida en curs (spec `docs/superpowers/specs/2026-11-12-panell-de-vida-d
       passos, son, entrenat/descans). El cercle suma tasques + hàbits que toquen + 4 metes de salut.
 - [x] **Fase 3 · Llarg termini:** `/objectius` (barra amb marca del ritme esperat, ±1 ràpid, per anys),
       `/estudis` (assignatures, entregues/exàmens amb vençuts en vermell, minuts per setmana), targetes
-      «Objectius» i «Properes entregues» a Avui. Navegació final: mòbil Avui · Hàbits · + · Objectius · Més.
+      «Objectius» i «Properes entregues» a Avui. Navegació (canviada el 2026-11-23): menú ☰ al mòbil.
 - [x] **Fase 4 · Diari:** `/diari` (ànim 1–5 amb emoji, nota fins a 2000 caràcters, qualsevol dia
       passat, gràfic de 30 dies amb buits on no hi ha entrada, llista d'entrades), targeta «Com estàs
       avui?» a Avui i frase del dia rotativa (12 frases a `QUOTES`).
@@ -115,9 +133,19 @@ Panell de vida en curs (spec `docs/superpowers/specs/2026-11-12-panell-de-vida-d
   - «Apunts»: captura ràpida (targeta a Avui i «+» → Apunt ràpid) i classificar cada apunt com a prioritat
     d'avui o demà, esdeveniment o entrega (taula `inbox_items`).
 
+- [x] **Menú lateral al mòbil** (2026-11-23): fora la barra de baix. Capçalera amb ☰ a dalt a l'esquerra que
+      obre un calaix amb totes les seccions i les pestanyes de Diners; «+»
+      flotant a baix a la dreta. El «+» (també a l'escriptori) ofereix Despesa i Ingrés a qualsevol pàgina.
+
+- [x] **Súper** (2026-11-23): pestanya Diners → «Súper» (`/super`). Catàleg de productes amb l'últim preu;
+      toques el que has comprat, revises (quantitats; als productes a pes hi poses l'import) i es desa com
+      **una despesa** (categoria «Supermercat») amb les línies a `purchase_items`. Si un preu canvia, el catàleg
+      s'actualitza. Historial «Últimes compres» amb «Torna a comprar el mateix». Taules `products` i
+      `purchase_items` (migració `20261123000000_shopping.sql`, ja aplicada al Supabase real).
+
 Taules del panell (totes amb RLS «own rows», migracions `20261112*` ja aplicades al Supabase real):
 `settings`, `tasks`, `events`, `countdowns`, `habits`, `habit_logs`, `health_logs`, `goals`, `courses`,
-`study_items`, `study_logs`, `journal_entries`, `inbox_items`. Plans de cada fase a `docs/superpowers/plans/`.
+`study_items`, `study_logs`, `journal_entries`, `inbox_items` (i de Diners: `products`, `purchase_items`). Plans de cada fase a `docs/superpowers/plans/`.
 
 ### v1 de diners (2026-11-10)
 

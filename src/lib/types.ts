@@ -206,3 +206,27 @@ export interface InboxItem {
   text: string;
   created_at: string;
 }
+
+/** Producte del catàleg del súper amb l'últim preu pagat (cèntims). */
+export interface Product {
+  id: string;
+  name: string;
+  /** Per unitat; als productes a pes, el que va costar l'últim paquet (només suggeriment). */
+  price_cents: number;
+  by_weight: boolean;
+  archived: boolean;
+  /** ISO date de l'últim preu */
+  price_date: string;
+  created_at: string;
+}
+
+/** Una línia d'una compra del súper (penja d'un moviment de despesa). */
+export interface PurchaseItem {
+  id: string;
+  transaction_id: string;
+  product_id: string | null;
+  name: string;
+  quantity: number;
+  unit_price_cents: number;
+  created_at: string;
+}

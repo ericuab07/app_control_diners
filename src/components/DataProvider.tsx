@@ -6,7 +6,7 @@ import { dueOccurrences } from "@/lib/calc/recurring";
 import { todayISO } from "@/lib/dates";
 import { DEFAULT_CATEGORIES } from "@/lib/defaults";
 import { supabase } from "@/lib/supabase";
-import type { Account, Budget, Category, PriceQuote, RecurringRule, Trade, Transaction } from "@/lib/types";
+import type { Account, Budget, Category, PriceQuote, Product, PurchaseItem, RecurringRule, Trade, Transaction } from "@/lib/types";
 
 interface Tables {
   accounts: Account;
@@ -15,11 +15,13 @@ interface Tables {
   recurring_rules: RecurringRule;
   budgets: Budget;
   trades: Trade;
+  products: Product;
+  purchase_items: PurchaseItem;
 }
 type TableName = keyof Tables;
 type State = { [K in TableName]: Tables[K][] };
 
-const EMPTY: State = { accounts: [], categories: [], transactions: [], recurring_rules: [], budgets: [], trades: [] };
+const EMPTY: State = { accounts: [], categories: [], transactions: [], recurring_rules: [], budgets: [], trades: [], products: [], purchase_items: [] };
 const PAGE = 1000;
 const QUOTE_TTL_MS = 15 * 60 * 1000;
 
@@ -106,17 +108,19 @@ async function runRecurring(rules: RecurringRule[]): Promise<boolean> {
 }
 
 async function loadEverything(): Promise<{ state: State; quotes: Map<string, PriceQuote> }> {
-  const [accounts, categories, transactions, recurring_rules, budgets, trades, cache] = await Promise.all([
+  const [accounts, categories, transactions, recurring_rules, budgets, trades, products, purchase_items, cache] = await Promise.all([
     fetchAll("accounts"),
     fetchAll("categories"),
     fetchAll("transactions"),
     fetchAll("recurring_rules"),
     fetchAll("budgets"),
     fetchAll("trades"),
+    fetchAll("products"),
+    fetchAll("purchase_items"),
     supabase.from("price_cache").select("*"),
   ]);
   if (cache.error) throw new Error(cache.error.message);
-  const state: State = { accounts, categories, transactions, recurring_rules, budgets, trades };
+  const state: State = { accounts, categories, transactions, recurring_rules, budgets, trades, products, purchase_items };
 
   if (categories.length === 0) {
     const { data, error } = await supabase
@@ -185,7 +189,13 @@ export function DataProvider({ session, children }: { session: Session; children
     if (error) throw new Error(error.message);
     // Esborrar un compte o una categoria afecta altres taules (cascade / set null): es recarrega tot.
     if (table === "accounts" || table === "categories" || table === "recurring_rules") await reload();
-    else setState((s) => ({ ...s, [table]: s[table].filter((r) => r.id !== id) }));
+    else setState((s) => ({
+      ...s,
+      [table]: s[table].filter((r) => r.id !== id),
+      // Les línies d'una compra s'esborren en cascada amb el moviment.
+      ...(table === "transactions" && { purchase_items: s.purchase_items.filter((i) => i.transaction_id !== id) }),
+      ...(table === "products" && { purchase_items: s.purchase_items.map((i) => (i.product_id === id ? { ...i, product_id: null } : i)) }),
+    }));
   }, [reload]);
 
   const fetchQuotes = useCallback(

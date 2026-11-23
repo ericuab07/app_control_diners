@@ -67,6 +67,8 @@ const db = {
   budgets: [],
   trades: [],
   price_cache: [],
+  products: [],
+  purchase_items: [],
 };
 for (let i = 1; i <= 6; i++) db.habit_logs.push(at({ habit_id: db.habits[0].id, date: addDays(-i) }));
 db.habit_logs.push(at({ habit_id: db.habits[1].id, date: addDays(-1) }), at({ habit_id: db.habits[2].id, date: today }));
@@ -85,6 +87,15 @@ db.transactions.push(
   at({ account_id: db.accounts[0].id, kind: "income", amount_cents: 90000, date: addDays(-8), description: "Nòmina", category_id: null, transfer_account_id: null, recurring_rule_id: null }),
   at({ account_id: db.accounts[0].id, kind: "expense", amount_cents: 4320, date: addDays(-2), description: "Supermercat", category_id: null, transfer_account_id: null, recurring_rule_id: null }),
 );
+
+// Súper: catàleg com el que Claude omple a partir d'un tiquet, i una compra ja feta.
+for (const [name, price_cents, by_weight] of [["Formatge tendre", 349, false], ["Pernil dolç", 215, false], ["Pit de pollastre", 612, true], ["Llet sencera", 95, false], ["Ous (12)", 289, false], ["Plàtans", 199, true], ["Pa de motlle", 145, false]]) {
+  db.products.push(at({ name, price_cents, by_weight, archived: false, price_date: addDays(-2) }));
+}
+for (const [i, quantity] of [[0, 1], [1, 2], [3, 6]]) {
+  const p = db.products[i];
+  db.purchase_items.push(at({ transaction_id: db.transactions[1].id, product_id: p.id, name: p.name, quantity, unit_price_cents: p.price_cents }));
+}
 
 const cors = {
   "Access-Control-Allow-Origin": "*",

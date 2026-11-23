@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cx } from "./ui";
 
-const TABS = [
+export const DINERS_TABS = [
   { href: "/diners", label: "Balanç" },
   { href: "/ingressos", label: "Ingressos" },
   { href: "/despeses", label: "Despeses" },
@@ -19,7 +19,7 @@ export function DinersTabs() {
   return (
     <nav aria-label="Diners" className="-mx-4 mb-5 overflow-x-auto px-4 md:mx-0 md:px-0">
       <div className="flex w-max gap-1 border-b border-border">
-        {TABS.map(({ href, label }) => {
+        {DINERS_TABS.map(({ href, label }) => {
           const active = pathname === href || pathname.startsWith(`${href}/`);
           return (
             <Link key={href} href={href} aria-current={active ? "page" : undefined}

@@ -109,8 +109,20 @@ textarea {
 .sheet-in {
   animation: sheet-in 0.18s ease-out;
 }
+@keyframes drawer-in {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: none;
+  }
+}
+.drawer-in {
+  animation: drawer-in 0.2s ease-out;
+}
 @media (prefers-reduced-motion: reduce) {
-  .sheet-in {
+  .sheet-in,
+  .drawer-in {
     animation: none;
   }
 }

@@ -1,46 +1,52 @@
 "use client";
 
-import { Ellipsis, Flame, GraduationCap, NotebookPen, Plus, Settings, Sun, Target, Wallet } from "lucide-react";
+import { Flame, GraduationCap, Menu, NotebookPen, Plus, Settings, Sun, Target, Wallet, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { isDinersPath, sectionOf, type Section } from "@/lib/nav";
-import { DinersTabs } from "./DinersTabs";
+import type { TxKind } from "@/lib/types";
+import { DINERS_TABS, DinersTabs } from "./DinersTabs";
 import { QuickAdd } from "./QuickAdd";
 import { TransactionForm } from "./TransactionForm";
 import { cx } from "./ui";
 
-type NavItem = { section: Section; href: string; label: string; icon: typeof Sun; mobile: "bar" | "more" };
+type NavItem = { section: Section; href: string; label: string; icon: typeof Sun };
 
 const NAV: NavItem[] = [
-  { section: "avui", href: "/", label: "Avui", icon: Sun, mobile: "bar" },
-  { section: "habits", href: "/habits", label: "Hàbits", icon: Flame, mobile: "bar" },
-  { section: "objectius", href: "/objectius", label: "Objectius", icon: Target, mobile: "bar" },
-  { section: "estudis", href: "/estudis", label: "Estudis", icon: GraduationCap, mobile: "more" },
-  { section: "diari", href: "/diari", label: "Diari", icon: NotebookPen, mobile: "more" },
-  { section: "diners", href: "/diners", label: "Diners", icon: Wallet, mobile: "more" },
-  { section: "configuracio", href: "/configuracio", label: "Configuració", icon: Settings, mobile: "more" },
+  { section: "avui", href: "/", label: "Avui", icon: Sun },
+  { section: "habits", href: "/habits", label: "Hàbits", icon: Flame },
+  { section: "objectius", href: "/objectius", label: "Objectius", icon: Target },
+  { section: "estudis", href: "/estudis", label: "Estudis", icon: GraduationCap },
+  { section: "diari", href: "/diari", label: "Diari", icon: NotebookPen },
+  { section: "diners", href: "/diners", label: "Diners", icon: Wallet },
+  { section: "configuracio", href: "/configuracio", label: "Configuració", icon: Settings },
 ];
-const BAR = NAV.filter((n) => n.mobile === "bar");
-const MORE = NAV.filter((n) => n.mobile === "more");
-// Al mòbil el botó «+» queda al centre: la meitat dels elements de la barra a l'esquerra.
-const BAR_LEFT = BAR.slice(0, Math.ceil(BAR.length / 2));
-const BAR_RIGHT = BAR.slice(Math.ceil(BAR.length / 2));
+
+/** Què s'està afegint: «auto» és el «+» (moviment a Diners, tria a la resta). */
+type Adding = null | "auto" | TxKind;
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const [adding, setAdding] = useState(false);
-  const [moreOpen, setMoreOpen] = useState(false);
+  const [adding, setAdding] = useState<Adding>(null);
+  const [menuOpen, setMenuOpen] = useState(false);
   const current = sectionOf(pathname);
   const inDiners = isDinersPath(pathname);
-  const defaultKind = pathname.startsWith("/ingressos") ? "income" : "expense";
+  const defaultKind: TxKind = pathname.startsWith("/ingressos") ? "income" : "expense";
+  const currentLabel = NAV.find((n) => n.section === current)?.label ?? "Panell de vida";
 
-  const mobileLink = ({ section, href, label, icon: Icon }: NavItem) => (
-    <Link key={href} href={href} onClick={() => setMoreOpen(false)} aria-current={current === section ? "page" : undefined}
-      className={cx("flex min-h-14 flex-col items-center justify-center gap-0.5 text-[11px] font-medium", current === section ? "text-primary" : "text-muted")}>
-      <Icon size={20} /> {label}
-    </Link>
-  );
+  useEffect(() => {
+    if (!menuOpen) return;
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setMenuOpen(false);
+    document.addEventListener("keydown", onKey);
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.body.style.overflow = "";
+    };
+  }, [menuOpen]);
+
+  const isActive = (href: string) => pathname === href || pathname.startsWith(`${href}/`);
 
   return (
     <div className="mx-auto flex min-h-dvh max-w-6xl">
@@ -52,43 +58,73 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <Icon size={18} /> {label}
           </Link>
         ))}
-        <button onClick={() => setAdding(true)} className="mt-4 inline-flex min-h-10 items-center justify-center gap-1.5 rounded-lg bg-primary px-3 text-sm font-medium text-primary-fg hover:opacity-90">
+        <button onClick={() => setAdding("auto")} className="mt-4 inline-flex min-h-10 items-center justify-center gap-1.5 rounded-lg bg-primary px-3 text-sm font-medium text-primary-fg hover:opacity-90">
           <Plus size={18} /> {inDiners ? "Nou moviment" : "Afegir"}
         </button>
       </aside>
 
-      <main className="min-w-0 flex-1 px-4 pb-24 pt-5 md:px-8 md:pb-10 md:pt-8">
-        {inDiners && <DinersTabs />}
-        {children}
-      </main>
+      <div className="min-w-0 flex-1">
+        {/* Capçalera del mòbil: menú a dalt a l'esquerra. */}
+        <header className="sticky top-0 z-30 flex items-center gap-2 border-b border-border bg-surface/95 px-2 pt-[env(safe-area-inset-top)] backdrop-blur md:hidden">
+          <button onClick={() => setMenuOpen(true)} aria-label="Obre el menú" aria-expanded={menuOpen}
+            className="grid size-11 place-items-center rounded-lg text-text hover:bg-surface-2">
+            <Menu size={24} />
+          </button>
+          <p className="min-w-0 truncate font-serif text-lg font-semibold tracking-tight">{currentLabel}</p>
+        </header>
 
-      <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-surface pb-[env(safe-area-inset-bottom)] md:hidden">
-        {moreOpen && (
-          <div className="border-b border-border p-2">
-            {MORE.map(({ section, href, label, icon: Icon }) => (
-              <Link key={href} href={href} onClick={() => setMoreOpen(false)}
-                className={cx("flex items-center gap-3 rounded-lg px-3 py-3 text-sm font-medium", current === section ? "text-primary" : "text-text")}>
-                <Icon size={18} /> {label}
-              </Link>
-            ))}
-          </div>
-        )}
-        <div className="grid auto-cols-fr grid-flow-col">
-          {BAR_LEFT.map(mobileLink)}
-          <button onClick={() => { setMoreOpen(false); setAdding(true); }} aria-label={inDiners ? "Nou moviment" : "Afegir"} className="grid place-items-center">
-            <span className="grid size-11 place-items-center rounded-full bg-primary text-primary-fg shadow-md"><Plus size={24} /></span>
-          </button>
-          {BAR_RIGHT.map(mobileLink)}
-          <button onClick={() => setMoreOpen((v) => !v)} aria-expanded={moreOpen}
-            className={cx("flex min-h-14 flex-col items-center justify-center gap-0.5 text-[11px] font-medium", moreOpen || MORE.some((n) => n.section === current) ? "text-primary" : "text-muted")}>
-            <Ellipsis size={20} /> Més
-          </button>
+        <main className="px-4 pb-24 pt-5 md:px-8 md:pb-10 md:pt-8">
+          {inDiners && <DinersTabs />}
+          {children}
+        </main>
+      </div>
+
+      {/* «+» flotant del mòbil, a l'abast del polze. */}
+      <button onClick={() => setAdding("auto")} aria-label={inDiners ? "Nou moviment" : "Afegir"}
+        className="fixed bottom-[max(1.25rem,env(safe-area-inset-bottom))] right-4 z-30 grid size-14 place-items-center rounded-full bg-primary text-primary-fg shadow-lg md:hidden">
+        <Plus size={26} />
+      </button>
+
+      {menuOpen && (
+        <div className="fixed inset-0 z-40 bg-black/50 md:hidden" onMouseDown={(e) => e.target === e.currentTarget && setMenuOpen(false)}>
+          <nav aria-label="Menú" className="drawer-in flex h-full w-[min(20rem,85vw)] flex-col overflow-y-auto border-r border-border bg-surface pb-[env(safe-area-inset-bottom)] pt-[env(safe-area-inset-top)]">
+            <div className="flex items-center justify-between px-4 py-3">
+              <p className="font-serif text-lg font-semibold tracking-tight">🌅 Panell de vida</p>
+              <button onClick={() => setMenuOpen(false)} aria-label="Tanca el menú" className="grid size-10 place-items-center rounded-lg text-muted hover:bg-surface-2">
+                <X size={22} />
+              </button>
+            </div>
+
+            <ul className="border-t border-border p-2">
+              {NAV.map(({ section, href, label, icon: Icon }) => (
+                <li key={href}>
+                  <Link href={href} onClick={() => setMenuOpen(false)} aria-current={current === section && section !== "diners" ? "page" : undefined}
+                    className={cx("flex min-h-12 items-center gap-3 rounded-lg px-3 text-[15px] font-medium", current === section ? "bg-primary/10 text-primary" : "text-text hover:bg-surface-2")}>
+                    <Icon size={20} /> {label}
+                  </Link>
+                  {section === "diners" && (
+                    <ul className="mb-1 ml-[1.375rem] border-l border-border pl-3">
+                      {DINERS_TABS.map((tab) => (
+                        <li key={tab.href}>
+                          <Link href={tab.href} onClick={() => setMenuOpen(false)} aria-current={isActive(tab.href) ? "page" : undefined}
+                            className={cx("flex min-h-10 items-center rounded-lg px-3 text-sm", isActive(tab.href) ? "font-medium text-primary" : "text-muted hover:bg-surface-2 hover:text-text")}>
+                            {tab.label}
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </nav>
         </div>
-      </nav>
+      )}
 
-      {adding && (inDiners
-        ? <TransactionForm defaultKind={defaultKind} onClose={() => setAdding(false)} />
-        : <QuickAdd onClose={() => setAdding(false)} />)}
+      {adding === "auto" && !inDiners && <QuickAdd onClose={() => setAdding(null)} />}
+      {adding !== null && (adding !== "auto" || inDiners) && (
+        <TransactionForm defaultKind={adding === "auto" ? defaultKind : adding} onClose={() => setAdding(null)} />
+      )}
     </div>
   );
 }
